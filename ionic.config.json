@@ -1,0 +1,7 @@
+{
+  "name": "InBetweenUs",
+  "integrations": {
+    "capacitor": {}
+  },
+  "type": "react-vite"
+}

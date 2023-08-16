@@ -1,0 +1,13 @@
+.results-container {
+    display: flex;
+    height: 100%;
+  }
+  
+  #no-results {
+    font-size: 24px;
+  }
+
+  #help-text {
+    font-size: 16px;
+  }
+  
