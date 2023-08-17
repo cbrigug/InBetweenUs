@@ -30,6 +30,7 @@ import {
 import axios, { all } from "axios";
 import GoogleMapsLink from "./GoogleMapsLink";
 import { convertSecondsToHoursMinutes } from "../utils/timeUtils";
+import { environment } from "../../environment.dev";
 
 interface ResultsProps {
     person1Zip: string;
@@ -37,16 +38,16 @@ interface ResultsProps {
 }
 
 interface Coordinates {
-    longitude: number;
     latitude: number;
+    longitude: number;
 }
 
-const apiKey = "";
+const API_KEY = environment.REACT_APP_GOOGLE_API_KEY;
 
 const zipToCoords = async (zip: string) => {
     try {
         const response = await fetch(
-            `https://maps.googleapis.com/maps/api/geocode/json?address=${zip}&key=${apiKey}`
+            `https://maps.googleapis.com/maps/api/geocode/json?address=${zip}&key=${API_KEY}`
         );
         const data = await response.json();
 
@@ -65,7 +66,7 @@ const zipToCoords = async (zip: string) => {
 const findCity = async (coords: Coordinates) => {
     try {
         const response = await fetch(
-            `https://maps.googleapis.com/maps/api/geocode/json?latlng=${coords.latitude},${coords.longitude}&key=${apiKey}`
+            `https://maps.googleapis.com/maps/api/geocode/json?latlng=${coords.latitude},${coords.longitude}&key=${API_KEY}`
         );
         const data = await response.json();
 
@@ -95,30 +96,34 @@ interface DistanceMatrixResponse {
     }[];
 }
 
-async function getDrivingTime(start: string, end: string): Promise<number> {
-    const url = `https://maps.googleapis.com/maps/api/distancematrix/json?units=imperial&origins=${start}&destinations=${end}&key=${apiKey}`;
+async function getDrivingTime(
+    start: string,
+    end: string,
+    departureTime: number
+): Promise<number> {
+    const url = `https://maps.googleapis.com/maps/api/distancematrix/json?units=imperial&origins=${start}&destinations=${end}&departure_time=${departureTime}&key=${API_KEY}`;
     const response = await axios.get<DistanceMatrixResponse>(url);
     const drivingTime = response.data.rows[0].elements[0].duration?.value;
     return drivingTime;
 }
 
-const drivingTimeCache = new Map<string, number>();
+// const drivingTimeCache = new Map<string, number>();
 
-async function getCachedDrivingTime(
-    start: string,
-    end: string
-): Promise<number> {
-    const cacheKey = `${start}-${end}`;
+// async function getCachedDrivingTime(
+//     start: string,
+//     end: string
+// ): Promise<number> {
+//     const cacheKey = `${start}-${end}`;
 
-    if (drivingTimeCache.has(cacheKey)) {
-        return drivingTimeCache.get(cacheKey)!;
-    }
+//     if (drivingTimeCache.has(cacheKey)) {
+//         return drivingTimeCache.get(cacheKey)!;
+//     }
 
-    const drivingTime = await getDrivingTime(start, end);
-    drivingTimeCache.set(cacheKey, drivingTime);
+//     const drivingTime = await getDrivingTime(start, end);
+//     drivingTimeCache.set(cacheKey, drivingTime);
 
-    return drivingTime;
-}
+//     return drivingTime;
+// }
 
 interface MidpointData {
     address: string;
@@ -128,87 +133,87 @@ interface MidpointData {
     algo: number;
 }
 
-async function findMidpoint(
+async function findLocationsToMeet(
     personALat: number,
     personALng: number,
     personBLat: number,
     personBLng: number,
     flexibility: number
-): Promise<MidpointData[]> {
-    const lyst: MidpointData[] = [];
-    const latRange = [personALat + flexibility, personBLat];
-    const lngRange = [personALng, personBLng - flexibility];
+): Promise<Coordinates[]> {
+    // Calculate the initial midpoint
+    const midpointLat = (personALat + personBLat) / 2;
+    const midpointLng = (personALng + personBLng) / 2;
+    let currentMidpoint = { latitude: midpointLat, longitude: midpointLng };
+    const stepSize = 0.005;
+    let test = "";
 
-    const numDivisions = 10;
-    const latIncrement = (latRange[1] - latRange[0]) / numDivisions;
-    const lngIncrement = (lngRange[1] - lngRange[0]) / numDivisions;
+    let longerTimePerson: "A" | "B" | null = null; // Store the longer time person
+    const currentDate = new Date();
+    currentDate.setDate(currentDate.getDate() + 1); // Add one day
+    currentDate.setUTCHours(4, 0, 0, 0); // Set time to 4am UTC
+    const departureTime = Math.floor(currentDate.getTime() / 1000);
 
-    let minDifference = Infinity;
-    let midpointLat = 0;
-    let midpointLng = 0;
+    for (let i = 0; i < 5; i++) {
+        // Get driving times for each person to the current midpoint
+        const personADrivingTime = await getDrivingTime(
+            `${personALat},${personALng}`,
+            `${currentMidpoint.latitude},${currentMidpoint.longitude}`,
+            departureTime
+        );
+        const personBDrivingTime = await getDrivingTime(
+            `${personBLat},${personBLng}`,
+            `${currentMidpoint.latitude},${currentMidpoint.longitude}`,
+            departureTime
+        );
 
-    const drivingTimePromises = [];
+        console.log(
+            "PersonA: " + convertSecondsToHoursMinutes(personADrivingTime)
+        );
+        console.log(
+            "PersonB: " + convertSecondsToHoursMinutes(personBDrivingTime)
+        );
 
-    for (let i = 0; i <= numDivisions; i++) {
-        const lat = latRange[0] + i * latIncrement;
-
-        for (let j = 0; j <= numDivisions; j++) {
-            const lng = lngRange[0] + j * lngIncrement;
-
-            drivingTimePromises.push(
-                getCachedDrivingTime(
-                    `${lat},${lng}`,
-                    `${personALat},${personALng}`
-                )
-            );
-            drivingTimePromises.push(
-                getCachedDrivingTime(
-                    `${lat},${lng}`,
-                    `${personBLat},${personBLng}`
-                )
-            );
+        // If driving time difference is within 5 minutes, return the current midpoint
+        if (Math.abs(personADrivingTime - personBDrivingTime) <= 5 * 60) {
+            return [currentMidpoint];
         }
+
+        if (longerTimePerson === null) {
+            longerTimePerson =
+                personADrivingTime > personBDrivingTime ? "A" : "B";
+        }
+
+        // Adjust the new midpoint coordinates towards the person with longer driving time
+        if (longerTimePerson === "A") {
+            currentMidpoint = {
+                longitude:
+                    currentMidpoint.longitude +
+                    (personALng - currentMidpoint.longitude) * stepSize,
+                latitude:
+                    currentMidpoint.latitude +
+                    (personALat - currentMidpoint.latitude) * stepSize,
+            };
+        } else {
+            currentMidpoint = {
+                longitude:
+                    currentMidpoint.longitude +
+                    (personBLng - currentMidpoint.longitude) * stepSize,
+                latitude:
+                    currentMidpoint.latitude +
+                    (personBLat - currentMidpoint.latitude) * stepSize,
+            };
+        }
+        test +=
+            currentMidpoint.latitude +
+            ", " +
+            currentMidpoint.longitude +
+            ", " +
+            (i + 1) +
+            "\n";
     }
 
-    const drivingTimes = await Promise.all(drivingTimePromises);
-
-    let drivingTimesIndex = 0;
-
-    for (let i = 0; i <= numDivisions; i++) {
-        const lat = latRange[0] + i * latIncrement;
-
-        for (let j = 0; j <= numDivisions; j++) {
-            const lng = lngRange[0] + j * lngIncrement;
-
-            const drivingTimeA = drivingTimes[drivingTimesIndex];
-            const drivingTimeB = drivingTimes[drivingTimesIndex + 1];
-            drivingTimesIndex += 2;
-
-            const difference = Math.abs(drivingTimeA - drivingTimeB);
-
-            if (difference > 2700) {
-                continue;
-            }
-
-            const averageDrivingTime = (drivingTimeA + drivingTimeB) / 2;
-
-            if (difference < minDifference) {
-                minDifference = difference;
-                midpointLat = lat;
-                midpointLng = lng;
-                lyst.push({
-                    address: "",
-                    midpoint: { latitude: lat, longitude: lng },
-                    drivingTimeA,
-                    drivingTimeB,
-                    algo: 0.5 * difference + 0.5 * averageDrivingTime,
-                });
-            }
-        }
-    }
-
-    const sortedLyst = lyst.sort((a, b) => a.algo - b.algo);
-    return sortedLyst;
+    console.log(test);
+    return [currentMidpoint];
 }
 
 const Results: React.FC = () => {
@@ -247,30 +252,28 @@ const Results: React.FC = () => {
                     setPerson1Coords(person1Coords);
                     setPerson2Coords(person2Coords);
 
-                    findMidpoint(
+                    findLocationsToMeet(
                         person1Coords.latitude,
                         person1Coords.longitude,
                         person2Coords.latitude,
                         person2Coords.longitude,
                         flexibility
-                    ).then(async (lyst: MidpointData[]) => {
+                    ).then(async (lyst: Coordinates[]) => {
                         // populate address field of midpoint data
-                        const allCities = await Promise.all(
-                            lyst.map(async (item) => {
-                                const city = await findCity(item.midpoint);
-                                item.address = city;
-                                return item;
-                            })
-                        );
-
-                        setMiddleCityList(allCities);
-
-                        if (allCities.length > 0) {
-                            setMiddleCity(allCities[0].address);
-                        } else {
-                            presentToast("bottom");
-                        }
-                        setIsLoading(false);
+                        // const allCities = await Promise.all(
+                        //     lyst.map(async (item) => {
+                        //         const city = await findCity(item);
+                        //         item.address = city;
+                        //         return item;
+                        //     })
+                        // );
+                        // setMiddleCityList(allCities);
+                        // if (allCities.length > 0) {
+                        //     setMiddleCity(allCities[0].address);
+                        // } else {
+                        //     presentToast("bottom");
+                        // }
+                        // setIsLoading(false);
                     });
                 }
             } catch (error) {
