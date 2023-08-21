@@ -148,12 +148,6 @@ async function findMidpoint(
         const route = response.data.routes[0];
         let accumulatedDistance = 0;
         let furthestCoordinates: Coordinates = { latitude: 0, longitude: 0 };
-        const totalDriveTime = (
-            await getDriveData(
-                `${personALat},${personALng}`,
-                `${personBLat},${personBLng}`
-            )
-        ).time;
 
         const middleDistanceMeters = route.legs[0].distance.value / 2;
 
@@ -181,83 +175,6 @@ async function findMidpoint(
                         (step.end_location.lng - step.start_location.lng);
 
                 furthestCoordinates = { latitude: lat, longitude: lng };
-
-                // fine tune midpoint to find most centralized location
-                // const personADriveTime = (
-                //     await getDriveData(
-                //         `${personALat},${personALng}`,
-                //         `${lat},${lng}`
-                //     )
-                // ).time;
-
-                // traverse the route until the time is within 2 minutes of half the total drive time
-                // while (Math.abs(personADriveTime - totalDriveTime / 2) > 120) {
-                //     const newLat =
-                //         furthestCoordinates.latitude +
-                //         (personALat - furthestCoordinates.latitude) / 100;
-                //     const newLng =
-                //         furthestCoordinates.longitude +
-                //         (personALng - furthestCoordinates.longitude) / 100;
-
-                // // if person A's drive time is greater than person B's, move the midpoint closer to person A
-                // if (personADriveTime.time > personBDriveTime.time) {
-                //     // move midpoint closer to person A
-                //     for (let i = 0; i < 5; i++) {
-                //         const newLat =
-                //             furthestCoordinates.latitude +
-                //             (personALat - furthestCoordinates.latitude) / 100;
-                //         const newLng =
-                //             furthestCoordinates.longitude +
-                //             (personALng - furthestCoordinates.longitude) / 100;
-
-                //         furthestCoordinates = {
-                //             latitude: newLat,
-                //             longitude: newLng,
-                //         };
-
-                //         const newPersonADriveTime = await getDriveData(
-                //             `${personALat},${personALng}`,
-                //             `${newLat},${newLng}`
-                //         );
-                //         const newPersonBDriveTime = await getDriveData(
-                //             `${personBLat},${personBLng}`,
-                //             `${newLat},${newLng}`
-                //         );
-                //         const difference = Math.abs(
-                //             newPersonADriveTime.time - newPersonBDriveTime.time
-                //         )
-                //         console.log(convertSecondsToHoursMinutes(difference));
-                //     }
-                // } else {
-                //     // move midpoint closer to person B
-                //     for (let i = 0; i < 5; i++) {
-                //         const newLat =
-                //             furthestCoordinates.latitude +
-                //             (personBLat - furthestCoordinates.latitude) / 100;
-                //         const newLng =
-                //             furthestCoordinates.longitude +
-                //             (personBLng - furthestCoordinates.longitude) / 100;
-
-                //         furthestCoordinates = {
-                //             latitude: newLat,
-                //             longitude: newLng,
-                //         };
-
-                //         const newPersonADriveTime = await getDriveData(
-                //             `${personALat},${personALng}`,
-                //             `${newLat},${newLng}`
-                //         );
-                //         const newPersonBDriveTime = await getDriveData(
-                //             `${personBLat},${personBLng}`,
-                //             `${newLat},${newLng}`
-                //         );
-                //         const difference = Math.abs(
-                //             newPersonADriveTime.time - newPersonBDriveTime.time
-                //         )
-                //         console.log(convertSecondsToHoursMinutes(difference));
-                //     }
-                // }
-
                 break;
             }
         }
