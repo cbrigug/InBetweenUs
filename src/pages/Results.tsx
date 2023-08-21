@@ -75,11 +75,12 @@ const findCity = async (coords: Coordinates) => {
 
         if (
             data.status === "OK" &&
-            data.results.length > 0 &&
-            data.results[0].address_components.length > 1
+            data.results.length > 0
         ) {
-            const city = data.results[0].formatted_address;
-            return city;
+            const city = data.results.find((result: any) => {
+                return result.types.includes("locality");
+            });
+            return city.formatted_address;
         } else {
             throw new Error("No city found for the given coordinates.");
         }
@@ -179,7 +180,7 @@ async function findMidpoint(
             }
         }
 
-        return [furthestCoordinates];
+        return furthestCoordinates;
     } catch (error) {
         console.error("Error fetching directions:", error);
         throw error;
@@ -199,7 +200,7 @@ async function findLocationsToMeet(
         personBLng
     );
 
-    return midpoint;
+    return [midpoint];
 }
 
 const Results: React.FC = () => {
@@ -257,19 +258,19 @@ const Results: React.FC = () => {
                     ).then(async (lyst: Coordinates[]) => {
                         setMidpoint(lyst[0]);
                         const personAStart = `${person1Coords.latitude},${person1Coords.longitude}`;
-                        const personBStart = `${person2Coords.latitude},${person2Coords.longitude}`;
-                        const end = `${lyst[0].latitude},${lyst[0].longitude}`;
+                        const personBStart = `${person2Coords.latitude},${person2Coords.longitude}`; 
                         // populate address field of midpoint data
                         const allCities = await Promise.all(
                             lyst.map(async (item) => {
+                                const middle = `${item.latitude},${item.longitude}`;
                                 return {
                                     ...item,
                                     address: await findCity(item),
                                     drivingTimeA: (
-                                        await getDriveData(personAStart, end)
+                                        await getDriveData(personAStart, middle)
                                     ).time,
                                     drivingTimeB: (
-                                        await getDriveData(personBStart, end)
+                                        await getDriveData(personBStart, middle)
                                     ).time,
                                 };
                             })
