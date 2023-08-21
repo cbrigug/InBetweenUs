@@ -106,10 +106,7 @@ interface DrivingTime {
     distance: number;
 }
 
-async function getDriveData(
-    start: string,
-    end: string
-): Promise<DrivingTime> {
+async function getDriveData(start: string, end: string): Promise<DrivingTime> {
     const url = `https://maps.googleapis.com/maps/api/distancematrix/json?units=imperial&origins=${start}&destinations=${end}&key=${API_KEY}`;
     const response = await axios.get<DistanceMatrixResponse>(url);
     const drivingTime = response.data.rows[0].elements[0].duration?.value;
@@ -135,56 +132,71 @@ async function findMidpoint(
         // Define the starting and destination locations as coordinates
         const startLocation = { lat: personALat, lng: personALng };
         const destinationLocation = { lat: personBLat, lng: personBLng };
+        
+        // Define the departure time as next day at 4:00 AM UTC (optimal conditions)
+        const currentDate = new Date();
+        currentDate.setDate(currentDate.getDate() + 1);
+        currentDate.setUTCHours(4, 0, 0, 0);
+        const departureTime = Math.floor(currentDate.getTime() / 1000);
 
         // Construct the URL for the Directions API request
-        const url = `https://maps.googleapis.com/maps/api/directions/json?origin=${startLocation.lat},${startLocation.lng}&destination=${destinationLocation.lat},${destinationLocation.lng}&mode=driving&key=${API_KEY}`;
+        const url = `https://maps.googleapis.com/maps/api/directions/json?origin=${startLocation.lat},${startLocation.lng}&destination=${destinationLocation.lat},${destinationLocation.lng}&mode=driving&departure_time=${departureTime}&traffic_model=optimistic&key=${API_KEY}`;
 
         // Make the API request using axios
         const response = await axios.get(url);
         const route = response.data.routes[0];
         let accumulatedDistance = 0;
         let furthestCoordinates: Coordinates = { latitude: 0, longitude: 0 };
+        const totalDriveTime = (
+            await getDriveData(
+                `${personALat},${personALng}`,
+                `${personBLat},${personBLng}`
+            )
+        ).time;
 
-        const middleDistanceMeters =
-            route.legs.reduce(
-                (total, leg) => total + (leg.distance.value || 0),
-                0
-            ) / 2;
+        const middleDistanceMeters = route.legs[0].distance.value / 2;
 
-        // Iterate through the route's legs
-        for (const leg of route.legs) {
-            const legDistance = leg.distance.value || 0;
-            accumulatedDistance += legDistance;
+        // Iterate through the route's steps
+        for (const step of route.legs[0].steps) {
+            const stepDistance = step.distance.value || 0;
+            accumulatedDistance += stepDistance;
 
             // If accumulated distance exceeds the maximum distance, break the loop
             if (accumulatedDistance > middleDistanceMeters) {
-                // Calculate the proportion of the leg to the maximum distance
+                // Calculate the proportion of the step to the maximum distance
                 const proportion =
                     (middleDistanceMeters -
-                        (accumulatedDistance - legDistance)) /
-                    legDistance;
+                        (accumulatedDistance - stepDistance)) /
+                    stepDistance;
 
-                // Calculate the coordinates at the specified proportion of the leg
+                // Calculate the coordinates at the specified proportion of the step
                 const lat =
-                    leg.start_location.lat +
+                    step.start_location.lat +
                     proportion *
-                        (leg.end_location.lat - leg.start_location.lat);
+                        (step.end_location.lat - step.start_location.lat);
                 const lng =
-                    leg.start_location.lng +
+                    step.start_location.lng +
                     proportion *
-                        (leg.end_location.lng - leg.start_location.lng);
+                        (step.end_location.lng - step.start_location.lng);
 
                 furthestCoordinates = { latitude: lat, longitude: lng };
 
                 // fine tune midpoint to find most centralized location
-                const personADriveTime = await getDriveData(
-                    `${personALat},${personALng}`,
-                    `${lat},${lng}`
-                );
-                const personBDriveTime = await getDriveData(
-                    `${personBLat},${personBLng}`,
-                    `${lat},${lng}`
-                );
+                // const personADriveTime = (
+                //     await getDriveData(
+                //         `${personALat},${personALng}`,
+                //         `${lat},${lng}`
+                //     )
+                // ).time;
+
+                // traverse the route until the time is within 2 minutes of half the total drive time
+                // while (Math.abs(personADriveTime - totalDriveTime / 2) > 120) {
+                //     const newLat =
+                //         furthestCoordinates.latitude +
+                //         (personALat - furthestCoordinates.latitude) / 100;
+                //     const newLng =
+                //         furthestCoordinates.longitude +
+                //         (personALng - furthestCoordinates.longitude) / 100;
 
                 // // if person A's drive time is greater than person B's, move the midpoint closer to person A
                 // if (personADriveTime.time > personBDriveTime.time) {
@@ -269,7 +281,6 @@ async function findLocationsToMeet(
         personBLng
     );
 
-    console.log(midpoint[0].latitude + ", " + midpoint[0].longitude);
     return midpoint;
 }
 
@@ -325,8 +336,12 @@ const Results: React.FC = () => {
                                 return {
                                     ...item,
                                     address: await findCity(item),
-                                    drivingTimeA: (await getDriveData(personAStart, end)).time,
-                                    drivingTimeB: (await getDriveData(personBStart, end)).time,
+                                    drivingTimeA: (
+                                        await getDriveData(personAStart, end)
+                                    ).time,
+                                    drivingTimeB: (
+                                        await getDriveData(personBStart, end)
+                                    ).time,
                                 };
                             })
                         );
