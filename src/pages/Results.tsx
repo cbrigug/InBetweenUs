@@ -1,4 +1,4 @@
-import * as GoogleMapsClient from "@google/maps";
+import { GoogleMap } from "@capacitor/google-maps";
 
 import {
     IonButton,
@@ -30,16 +30,17 @@ import {
     timeOutline,
 } from "ionicons/icons";
 import axios, { all } from "axios";
-import GoogleMapsLink from "./GoogleMapsLink";
+import GoogleMapsLink from "../components/GoogleMapsLink";
 import { convertSecondsToHoursMinutes } from "../utils/timeUtils";
 import { environment } from "../../environment.dev";
+import Map from "../components/Map";
 
 interface ResultsProps {
     person1Zip: string;
     person2Zip: string;
 }
 
-interface Coordinates {
+export interface Coordinates {
     latitude: number;
     longitude: number;
 }
@@ -132,7 +133,7 @@ async function findMidpoint(
         // Define the starting and destination locations as coordinates
         const startLocation = { lat: personALat, lng: personALng };
         const destinationLocation = { lat: personBLat, lng: personBLng };
-        
+
         // Define the departure time as next day at 4:00 AM UTC (optimal conditions)
         const currentDate = new Date();
         currentDate.setDate(currentDate.getDate() + 1);
@@ -292,8 +293,18 @@ const Results: React.FC = () => {
     const [index, setIndex] = useState(0);
     const [middleCity, setMiddleCity] = useState("");
 
-    const [person1Coords, setPerson1Coords] = useState<Coordinates>();
-    const [person2Coords, setPerson2Coords] = useState<Coordinates>();
+    const [midpoint, setMidpoint] = useState<Coordinates>({
+        latitude: 0,
+        longitude: 0,
+    });
+    const [person1Coords, setPerson1Coords] = useState<Coordinates>({
+        latitude: 0,
+        longitude: 0,
+    });
+    const [person2Coords, setPerson2Coords] = useState<Coordinates>({
+        latitude: 0,
+        longitude: 0,
+    });
 
     const [flexibility, setFlexibility] = useState(0);
 
@@ -327,6 +338,7 @@ const Results: React.FC = () => {
                         person2Coords.longitude
                         // flexibility
                     ).then(async (lyst: Coordinates[]) => {
+                        setMidpoint(lyst[0]);
                         const personAStart = `${person1Coords.latitude},${person1Coords.longitude}`;
                         const personBStart = `${person2Coords.latitude},${person2Coords.longitude}`;
                         const end = `${lyst[0].latitude},${lyst[0].longitude}`;
@@ -470,6 +482,15 @@ const Results: React.FC = () => {
                                                 />
                                             )}
                                         </IonButton>
+                                    </IonCol>
+                                </IonRow>
+                                <IonRow>
+                                    <IonCol>
+                                        <Map
+                                            center={midpoint}
+                                            personA={person1Coords}
+                                            personB={person2Coords}
+                                        />
                                     </IonCol>
                                 </IonRow>
                             </IonGrid>
