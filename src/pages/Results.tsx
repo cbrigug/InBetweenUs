@@ -376,6 +376,15 @@ const Results: React.FC = () => {
                                 })
                             );
 
+                            // sort by difference in driving time
+                            allCities.sort((a, b) => {
+                                const differenceA =
+                                    Math.abs(a.drivingTimeA - a.drivingTimeB);
+                                const differenceB =
+                                    Math.abs(b.drivingTimeA - b.drivingTimeB);
+                                return differenceA - differenceB;
+                            });
+
                             setMiddleCityList(allCities);
                             if (allCities.length > 0) {
                                 setMiddleCity(allCities[0].address);
