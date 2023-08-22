@@ -1,5 +1,3 @@
-import { GoogleMap } from "@capacitor/google-maps";
-
 import {
     IonButton,
     IonButtons,
@@ -8,7 +6,6 @@ import {
     IonGrid,
     IonHeader,
     IonIcon,
-    IonLoading,
     IonPage,
     IonRange,
     IonRow,
@@ -22,20 +19,15 @@ import "./Results.css";
 import { useLocation } from "react-router";
 import { useEffect, useState } from "react";
 import {
-    carOutline,
     chevronExpandOutline,
     helpCircleOutline,
-    locationOutline,
-    person,
     refreshOutline,
-    timeOutline,
 } from "ionicons/icons";
 import axios, { all } from "axios";
 import GoogleMapsLink from "../components/GoogleMapsLink";
 import { convertSecondsToHoursMinutes } from "../utils/timeUtils";
 import { environment } from "../../environment.dev";
 import Map from "../components/Map";
-import { get } from "http";
 
 interface ResultsProps {
     person1Zip: string;
@@ -50,10 +42,19 @@ export interface Coordinates {
 const GOOGLE_API_KEY = environment.REACT_APP_GOOGLE_API_KEY;
 const HERE_API_KEY = environment.REACT_APP_HERE_API_KEY;
 
+interface CachedCityData {
+    flexibility: number;
+    person1Zip: string;
+    person2Zip: string;
+    cities: any[]; // Update the type to match your city data structure
+}
+
 interface ZipToCoordsCache {
     [zip: string]: Coordinates;
 }
 const zipToCoordsCache: ZipToCoordsCache = {};
+const cachedDriveData = localStorage.getItem('driveDataCache');
+const driveDataCache = cachedDriveData ? JSON.parse(cachedDriveData) : {};
 
 const zipToCoords = async (zip: string) => {
     try {
@@ -102,9 +103,16 @@ interface DrivingTime {
 
 async function getDriveData(start: string, end: string): Promise<DrivingTime> {
     const url = `https://maps.googleapis.com/maps/api/distancematrix/json?units=imperial&origins=${start}&destinations=${end}&key=${GOOGLE_API_KEY}`;
+    if (driveDataCache[`${start}-${end}`]) {
+        return driveDataCache[`${start}-${end}`];
+    }
     const response = await axios.get<DistanceMatrixResponse>(url);
     const drivingTime = response.data.rows[0].elements[0].duration?.value;
     const distance = response.data.rows[0].elements[0].distance?.value;
+    driveDataCache[`${start}-${end}`] = { time: drivingTime, distance };
+
+    localStorage.setItem('driveDataCache', JSON.stringify(driveDataCache));
+
     return { time: drivingTime, distance: distance };
 }
 
@@ -277,6 +285,9 @@ interface ShortCoords {
 interface LocationData {
     title: string;
     position: ShortCoords;
+    address: string;
+    drivingTimeA: number;
+    drivingTimeB: number;
 }
 
 async function findLocationsToMeet(
@@ -321,7 +332,7 @@ const Results: React.FC = () => {
             position: position,
         });
     };
-    const [cachedCities, setCachedCities] = useState<any[]>([]);
+    const [cachedCities, setCachedCities] = useState<CachedCityData[]>([]);
 
     useEffect(() => {
         const fetchCoords = async () => {
@@ -334,8 +345,7 @@ const Results: React.FC = () => {
                     setPerson2Coords(person2Coords);
 
                     const cachedDataForCurrentFlexibility = cachedCities.find(
-                        (cachedCity) =>
-                            cachedCity.flexibility === flexibility
+                        (cachedCity) => cachedCity.flexibility === flexibility
                     );
 
                     if (cachedDataForCurrentFlexibility) {
@@ -347,62 +357,61 @@ const Results: React.FC = () => {
                         );
                         setIsLoading(false);
                     } else {
-                        findLocationsToMeet(
+                        const locations = await findLocationsToMeet(
                             person1Coords,
                             person2Coords,
                             flexibility
-                        ).then(async (locations) => {
-                            const personAStart = `${person1Coords.latitude},${person1Coords.longitude}`;
-                            const personBStart = `${person2Coords.latitude},${person2Coords.longitude}`;
-                            const allCities = await Promise.all(
-                                locations.map(async (location) => {
-                                    const middle = `${location.position.lat},${location.position.lng}`;
-                                    return {
-                                        ...location,
-                                        address: location.title,
-                                        drivingTimeA: (
-                                            await getDriveData(
-                                                personAStart,
-                                                middle
-                                            )
-                                        ).time,
-                                        drivingTimeB: (
-                                            await getDriveData(
-                                                personBStart,
-                                                middle
-                                            )
-                                        ).time,
-                                    };
-                                })
-                            );
+                        );
 
-                            // sort by difference in driving time
-                            allCities.sort((a, b) => {
-                                const differenceA =
-                                    Math.abs(a.drivingTimeA - a.drivingTimeB);
-                                const differenceB =
-                                    Math.abs(b.drivingTimeA - b.drivingTimeB);
-                                return differenceA - differenceB;
-                            });
-
-                            setMiddleCityList(allCities);
-                            if (allCities.length > 0) {
-                                setMiddleCity(allCities[0].address);
-                                const newCachedCityData = {
-                                    flexibility,
-                                    person1Zip,
-                                    person2Zip,
-                                    cities: allCities,
+                        const personAStart = `${person1Coords.latitude},${person1Coords.longitude}`;
+                        const personBStart = `${person2Coords.latitude},${person2Coords.longitude}`;
+                        const allCities = await Promise.all(
+                            locations.map(async (location) => {
+                                const middle = `${location.position.lat},${location.position.lng}`;
+                                return {
+                                    ...location,
+                                    address: location.title,
+                                    drivingTimeA: (
+                                        await getDriveData(personAStart, middle)
+                                    ).time,
+                                    drivingTimeB: (
+                                        await getDriveData(personBStart, middle)
+                                    ).time,
                                 };
-                                setCachedCities([
-                                    ...cachedCities,
-                                    newCachedCityData,
-                                ]);
-                            } else {
-                                presentToast("bottom");
-                            }
-                            setIsLoading(false);
+                            })
+                        );
+
+                        allCities.sort((a, b) => {
+                            const differenceA = Math.abs(
+                                a.drivingTimeA - a.drivingTimeB
+                            );
+                            const differenceB = Math.abs(
+                                b.drivingTimeA - b.drivingTimeB
+                            );
+                            return differenceA - differenceB;
                         });
+
+                        setMiddleCityList(allCities);
+                        if (allCities.length > 0) {
+                            setMiddleCity(allCities[0].address);
+                            const newCachedCityData = {
+                                flexibility,
+                                person1Zip,
+                                person2Zip,
+                                cities: allCities,
+                            };
+                            setCachedCities([
+                                ...cachedCities,
+                                newCachedCityData,
+                            ]);
+                            localStorage.setItem(
+                                `${person1Zip}-${person2Zip}`,
+                                JSON.stringify(newCachedCityData)
+                            );
+                        } else {
+                            presentToast("bottom");
+                        }
+                        setIsLoading(false);
                     }
                 }
             } catch (error) {
