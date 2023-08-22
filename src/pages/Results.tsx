@@ -26,6 +26,7 @@ import {
     chevronExpandOutline,
     helpCircleOutline,
     locationOutline,
+    person,
     refreshOutline,
     timeOutline,
 } from "ionicons/icons";
@@ -34,6 +35,7 @@ import GoogleMapsLink from "../components/GoogleMapsLink";
 import { convertSecondsToHoursMinutes } from "../utils/timeUtils";
 import { environment } from "../../environment.dev";
 import Map from "../components/Map";
+import { get } from "http";
 
 interface ResultsProps {
     person1Zip: string;
@@ -45,48 +47,38 @@ export interface Coordinates {
     longitude: number;
 }
 
-const API_KEY = environment.REACT_APP_GOOGLE_API_KEY;
+const GOOGLE_API_KEY = environment.REACT_APP_GOOGLE_API_KEY;
+const HERE_API_KEY = environment.REACT_APP_HERE_API_KEY;
+
+interface ZipToCoordsCache {
+    [zip: string]: Coordinates;
+}
+const zipToCoordsCache: ZipToCoordsCache = {};
 
 const zipToCoords = async (zip: string) => {
     try {
+        if (zipToCoordsCache[zip]) {
+            return zipToCoordsCache[zip];
+        }
         const response = await fetch(
-            `https://maps.googleapis.com/maps/api/geocode/json?address=${zip}&key=${API_KEY}`
+            `https://maps.googleapis.com/maps/api/geocode/json?address=${zip}&key=${GOOGLE_API_KEY}`
         );
         const data = await response.json();
 
         if (data.status === "OK" && data.results.length > 0) {
             const { lat, lng } = data.results[0].geometry.location;
-            return { longitude: lng, latitude: lat };
+            const coords = { longitude: lng, latitude: lat };
+
+            // Cache the coordinates
+            zipToCoordsCache[zip] = coords;
+
+            return coords;
         } else {
             throw new Error("No coordinates found for the given zip code.");
         }
     } catch (error) {
         console.error("Error converting zip code to coordinates:", error);
         throw error;
-    }
-};
-
-const findCity = async (coords: Coordinates) => {
-    try {
-        const response = await fetch(
-            `https://maps.googleapis.com/maps/api/geocode/json?latlng=${coords.latitude},${coords.longitude}&key=${API_KEY}`
-        );
-        const data = await response.json();
-
-        if (
-            data.status === "OK" &&
-            data.results.length > 0
-        ) {
-            const city = data.results.find((result: any) => {
-                return result.types.includes("locality");
-            });
-            return city.formatted_address;
-        } else {
-            throw new Error("No city found for the given coordinates.");
-        }
-    } catch (error) {
-        console.error("Error finding middle city:", error);
-        return "";
     }
 };
 
@@ -109,7 +101,7 @@ interface DrivingTime {
 }
 
 async function getDriveData(start: string, end: string): Promise<DrivingTime> {
-    const url = `https://maps.googleapis.com/maps/api/distancematrix/json?units=imperial&origins=${start}&destinations=${end}&key=${API_KEY}`;
+    const url = `https://maps.googleapis.com/maps/api/distancematrix/json?units=imperial&origins=${start}&destinations=${end}&key=${GOOGLE_API_KEY}`;
     const response = await axios.get<DistanceMatrixResponse>(url);
     const drivingTime = response.data.rows[0].elements[0].duration?.value;
     const distance = response.data.rows[0].elements[0].distance?.value;
@@ -124,16 +116,11 @@ interface MidpointData {
     algo: number;
 }
 
-async function findMidpoint(
-    personALat: number,
-    personALng: number,
-    personBLat: number,
-    personBLng: number
-) {
+async function findMidpoint(personA: Coordinates, personB: Coordinates) {
     try {
         // Define the starting and destination locations as coordinates
-        const startLocation = { lat: personALat, lng: personALng };
-        const destinationLocation = { lat: personBLat, lng: personBLng };
+        const startLocation = personA;
+        const destinationLocation = personB;
 
         // Define the departure time as next day at 4:00 AM UTC (optimal conditions)
         const currentDate = new Date();
@@ -142,7 +129,7 @@ async function findMidpoint(
         const departureTime = Math.floor(currentDate.getTime() / 1000);
 
         // Construct the URL for the Directions API request
-        const url = `https://maps.googleapis.com/maps/api/directions/json?origin=${startLocation.lat},${startLocation.lng}&destination=${destinationLocation.lat},${destinationLocation.lng}&mode=driving&departure_time=${departureTime}&traffic_model=optimistic&key=${API_KEY}`;
+        const url = `https://maps.googleapis.com/maps/api/directions/json?origin=${startLocation.latitude},${startLocation.longitude}&destination=${destinationLocation.latitude},${destinationLocation.longitude}&mode=driving&departure_time=${departureTime}&traffic_model=optimistic&key=${GOOGLE_API_KEY}`;
 
         // Make the API request using axios
         const response = await axios.get(url);
@@ -187,20 +174,120 @@ async function findMidpoint(
     }
 }
 
-async function findLocationsToMeet(
-    personALat: number,
-    personALng: number,
-    personBLat: number,
-    personBLng: number
-): Promise<Coordinates[]> {
-    const midpoint = await findMidpoint(
-        personALat,
-        personALng,
-        personBLat,
-        personBLng
+interface ShiftedCoordinates {
+    halfOne: Coordinates;
+    halfTwo: Coordinates;
+}
+
+function calcPerpendicularSlope(personA: Coordinates, personB: Coordinates) {
+    const slope =
+        (personB.longitude - personA.longitude) /
+        (personB.latitude - personA.latitude);
+    return -1 / slope;
+}
+
+function addDistanceToCenterCoords(
+    personA: Coordinates,
+    personB: Coordinates,
+    center: Coordinates,
+    radius: number,
+    flexibility: number
+): ShiftedCoordinates {
+    const diameter = radius * 2 * flexibility;
+    // angle should be the slope of the perpendicular line that connects personA and personB
+    // we add pi to get the other side of the line
+    let angle = Math.atan(calcPerpendicularSlope(personA, personB));
+
+    // calculate the coordinates of a line that is pointed in the direction of angle, traversing it n meters
+    // we want to search a new area so we go the full diameter of the search area
+    const halfOneShiftedX =
+        center.longitude + (diameter / 111111) * Math.cos(angle);
+    const halfOneShiftedY =
+        center.latitude + (diameter / 111111) * Math.sin(angle);
+
+    const halfTwoShiftedX =
+        center.longitude + (diameter / 111111) * Math.cos(angle + Math.PI);
+    const halfTwoShiftedY =
+        center.latitude + (diameter / 111111) * Math.sin(angle + Math.PI);
+
+    const halfOne: Coordinates = {
+        latitude: halfOneShiftedY,
+        longitude: halfOneShiftedX,
+    };
+    const halfTwo: Coordinates = {
+        latitude: halfTwoShiftedY,
+        longitude: halfTwoShiftedX,
+    };
+
+    return { halfOne, halfTwo };
+}
+
+async function getCitiesByRadius(
+    personA: Coordinates,
+    personB: Coordinates,
+    center: Coordinates,
+    flexibility: number
+) {
+    const radius = 24140; // radius in meters (15 miles)
+    const latitude = center.latitude;
+    const longitude = center.longitude;
+
+    if (flexibility === 0) {
+        const url = `https://revgeocode.search.hereapi.com/v1/revgeocode?in=circle:${latitude},${longitude};r=${radius}&types=city&limit=25&apiKey=${HERE_API_KEY}`;
+        const response = await axios.get(url);
+
+        return response.data.items.filter((item: any, index: number) => {
+            return index % 4 === 0;
+        });
+    }
+
+    let cities = [];
+    const newCoords = addDistanceToCenterCoords(
+        personA,
+        personB,
+        center,
+        radius,
+        flexibility
     );
 
-    return [midpoint];
+    for (const coords of [newCoords.halfOne, newCoords.halfTwo]) {
+        const url = `https://revgeocode.search.hereapi.com/v1/revgeocode?in=circle:${coords.latitude},${coords.longitude};r=${radius}&types=city&limit=20&apiKey=${HERE_API_KEY}`;
+        const response = await axios.get(url);
+        // push every third city
+        cities.push(
+            ...response.data.items.filter((item: any, index: number) => {
+                return index % 10 === 0;
+            })
+        );
+    }
+
+    // sort by distance
+    return cities.sort((a: any, b: any) => {
+        const distanceA = a.distance;
+        const distanceB = b.distance;
+        return distanceA - distanceB;
+    });
+}
+
+interface ShortCoords {
+    lat: number;
+    lng: number;
+}
+
+interface LocationData {
+    title: string;
+    position: ShortCoords;
+}
+
+async function findLocationsToMeet(
+    personA: Coordinates,
+    personB: Coordinates,
+    flexibility: number
+): Promise<LocationData[]> {
+    const midpoint = await findMidpoint(personA, personB);
+    const cities = getCitiesByRadius(personA, personB, midpoint, flexibility);
+
+    return cities;
 }
 
 const Results: React.FC = () => {
@@ -211,10 +298,6 @@ const Results: React.FC = () => {
     const [index, setIndex] = useState(0);
     const [middleCity, setMiddleCity] = useState("");
 
-    const [midpoint, setMidpoint] = useState<Coordinates>({
-        latitude: 0,
-        longitude: 0,
-    });
     const [person1Coords, setPerson1Coords] = useState<Coordinates>({
         latitude: 0,
         longitude: 0,
@@ -238,6 +321,7 @@ const Results: React.FC = () => {
             position: position,
         });
     };
+    const [cachedCities, setCachedCities] = useState<any[]>([]);
 
     useEffect(() => {
         const fetchCoords = async () => {
@@ -249,40 +333,68 @@ const Results: React.FC = () => {
                     setPerson1Coords(person1Coords);
                     setPerson2Coords(person2Coords);
 
-                    findLocationsToMeet(
-                        person1Coords.latitude,
-                        person1Coords.longitude,
-                        person2Coords.latitude,
-                        person2Coords.longitude
-                        // flexibility
-                    ).then(async (lyst: Coordinates[]) => {
-                        setMidpoint(lyst[0]);
-                        const personAStart = `${person1Coords.latitude},${person1Coords.longitude}`;
-                        const personBStart = `${person2Coords.latitude},${person2Coords.longitude}`; 
-                        // populate address field of midpoint data
-                        const allCities = await Promise.all(
-                            lyst.map(async (item) => {
-                                const middle = `${item.latitude},${item.longitude}`;
-                                return {
-                                    ...item,
-                                    address: await findCity(item),
-                                    drivingTimeA: (
-                                        await getDriveData(personAStart, middle)
-                                    ).time,
-                                    drivingTimeB: (
-                                        await getDriveData(personBStart, middle)
-                                    ).time,
-                                };
-                            })
+                    const cachedDataForCurrentFlexibility = cachedCities.find(
+                        (cachedCity) =>
+                            cachedCity.flexibility === flexibility
+                    );
+
+                    if (cachedDataForCurrentFlexibility) {
+                        setMiddleCityList(
+                            cachedDataForCurrentFlexibility.cities
                         );
-                        setMiddleCityList(allCities);
-                        if (allCities.length > 0) {
-                            setMiddleCity(allCities[0].address);
-                        } else {
-                            presentToast("bottom");
-                        }
+                        setMiddleCity(
+                            cachedDataForCurrentFlexibility.cities[0].address
+                        );
                         setIsLoading(false);
-                    });
+                    } else {
+                        findLocationsToMeet(
+                            person1Coords,
+                            person2Coords,
+                            flexibility
+                        ).then(async (locations) => {
+                            const personAStart = `${person1Coords.latitude},${person1Coords.longitude}`;
+                            const personBStart = `${person2Coords.latitude},${person2Coords.longitude}`;
+                            const allCities = await Promise.all(
+                                locations.map(async (location) => {
+                                    const middle = `${location.position.lat},${location.position.lng}`;
+                                    return {
+                                        ...location,
+                                        address: location.title,
+                                        drivingTimeA: (
+                                            await getDriveData(
+                                                personAStart,
+                                                middle
+                                            )
+                                        ).time,
+                                        drivingTimeB: (
+                                            await getDriveData(
+                                                personBStart,
+                                                middle
+                                            )
+                                        ).time,
+                                    };
+                                })
+                            );
+
+                            setMiddleCityList(allCities);
+                            if (allCities.length > 0) {
+                                setMiddleCity(allCities[0].address);
+                                const newCachedCityData = {
+                                    flexibility,
+                                    person1Zip,
+                                    person2Zip,
+                                    cities: allCities,
+                                };
+                                setCachedCities([
+                                    ...cachedCities,
+                                    newCachedCityData,
+                                ]);
+                            } else {
+                                presentToast("bottom");
+                            }
+                            setIsLoading(false);
+                        });
+                    }
                 }
             } catch (error) {
                 console.error("Error: ", error);
@@ -405,7 +517,14 @@ const Results: React.FC = () => {
                                 <IonRow>
                                     <IonCol>
                                         <Map
-                                            center={midpoint}
+                                            center={{
+                                                latitude:
+                                                    middleCityList[index]
+                                                        .position.lat,
+                                                longitude:
+                                                    middleCityList[index]
+                                                        .position.lng,
+                                            }}
                                             personA={person1Coords}
                                             personB={person2Coords}
                                         />
