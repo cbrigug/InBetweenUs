@@ -12,25 +12,25 @@ import { useHistory } from "react-router-dom";
 import React from "react";
 
 const Home = () => {
-    const [person1Zip, setPerson1Zip] = useState("");
-    const [person2Zip, setPerson2Zip] = useState("");
+    const [personAZip, setpersonAZip] = useState("");
+    const [personBZip, setpersonBZip] = useState("");
     const history = useHistory();
 
     const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
 
         history.push("/results", {
-            person1Zip,
-            person2Zip,
+            personAZip,
+            personBZip,
         });
     };
 
-    const handlePerson1ZipChange = (location: string) => {
-        setPerson1Zip(location);
+    const handlepersonAZipChange = (location: string) => {
+        setpersonAZip(location);
     };
 
-    const handlePerson2ZipChange = (location: string) => {
-        setPerson2Zip(location);
+    const handlepersonBZipChange = (location: string) => {
+        setpersonBZip(location);
     };
 
     return (
@@ -49,11 +49,11 @@ const Home = () => {
                 <form onSubmit={handleSubmit}>
                     <LocationInput
                         label="Person 1 Location"
-                        onLocationChange={handlePerson1ZipChange}
+                        onLocationChange={handlepersonAZipChange}
                     />
                     <LocationInput
                         label="Person 2 Location"
-                        onLocationChange={handlePerson2ZipChange}
+                        onLocationChange={handlepersonBZipChange}
                     />
                     <IonButton type="submit" expand="block">
                         Go!
