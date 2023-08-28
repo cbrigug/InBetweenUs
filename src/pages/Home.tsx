@@ -4,12 +4,12 @@ import {
     IonPage,
     IonTitle,
     IonToolbar,
-    IonButton,
+    IonGrid,
 } from "@ionic/react";
-import LocationInput from "../components/LocationInput";
 import { useState } from "react";
 import { useHistory } from "react-router-dom";
 import React from "react";
+import AddPersonCard from "../components/AddPersonCard";
 
 const Home = () => {
     const [personAZip, setpersonAZip] = useState("");
@@ -41,24 +41,10 @@ const Home = () => {
                 </IonToolbar>
             </IonHeader>
             <IonContent className="ion-padding">
-                <h1>Welcome to In Between Us!</h1>
-                <p>
-                    Connect with friends and discover new places in between your
-                    locations.
-                </p>
-                <form onSubmit={handleSubmit}>
-                    <LocationInput
-                        label="Person 1 Location"
-                        onLocationChange={handlepersonAZipChange}
-                    />
-                    <LocationInput
-                        label="Person 2 Location"
-                        onLocationChange={handlepersonBZipChange}
-                    />
-                    <IonButton type="submit" expand="block">
-                        Go!
-                    </IonButton>
-                </form>
+                <IonGrid style={{ height: "100%" }}>
+                    <AddPersonCard isPersonA={true} />
+                    <AddPersonCard isPersonA={false} />
+                </IonGrid>
             </IonContent>
         </IonPage>
     );

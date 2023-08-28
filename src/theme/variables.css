@@ -77,7 +77,18 @@ http://ionicframework.com/docs/theming/ */
     --ion-color-lightblue-shade: #8ab4de;
     --ion-color-lightblue-tint: #a7d1fc;
 
-    --ion-font-family: 'AppFont';
+    --ion-font-family: "AppFont";
+}
+
+.ion-color-lightblue {
+    --ion-color-base: var(--ion-color-lightblue) !important;
+    --ion-color-base-rgb: var(--ion-color-lightblue-rgb) !important;
+    --ion-color-contrast: var(--ion-color-lightblue-contrast) !important;
+    --ion-color-contrast-rgb: var(
+        --ion-color-lightblue-contrast-rgb
+    ) !important;
+    --ion-color-shade: var(--ion-color-lightblue-shade) !important;
+    --ion-color-tint: var(--ion-color-lightblue-tint) !important;
 }
 
 @media (prefers-color-scheme: dark) {
