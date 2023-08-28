@@ -30,6 +30,7 @@ import { convertSecondsToHoursMinutes } from "../utils/timeUtils";
 import { environment } from "../../environment.dev";
 import Map from "../components/Map";
 import React from "react";
+import NoResultsFound from "../components/NoResultsFound";
 
 interface ResultsProps {
     person1Zip: string;
@@ -547,14 +548,7 @@ const Results: React.FC = () => {
                             </IonGrid>
                         </>
                     ) : (
-                        <div className="no-results ion-text-center ion-justify-content-center ion-align-items-center">
-                            <IonText id="no-results">No Results Found</IonText>
-                            <br />
-                            <IonText color="medium">
-                                Sorry, we couldn't find any results based on
-                                your search.
-                            </IonText>
-                        </div>
+                        <NoResultsFound />
                     )}
                 </div>
                 <IonLoading isOpen={isLoading} />
