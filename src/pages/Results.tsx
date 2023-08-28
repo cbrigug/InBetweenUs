@@ -6,6 +6,7 @@ import {
     IonGrid,
     IonHeader,
     IonIcon,
+    IonLoading,
     IonPage,
     IonRange,
     IonRow,
@@ -308,7 +309,6 @@ const Results: React.FC = () => {
 
     const [middleCityList, setMiddleCityList] = useState<any[]>([]);
     const [index, setIndex] = useState(0);
-    const [middleCity, setMiddleCity] = useState("");
 
     const [person1Coords, setPerson1Coords] = useState<Coordinates>({
         latitude: 0,
@@ -338,23 +338,23 @@ const Results: React.FC = () => {
     useEffect(() => {
         const fetchCoords = async () => {
             try {
-                setIsLoading(true);
                 if (person1Zip && person2Zip) {
+                    setIsLoading(true);
                     const person1Coords = await zipToCoords(person1Zip);
                     const person2Coords = await zipToCoords(person2Zip);
                     setPerson1Coords(person1Coords);
                     setPerson2Coords(person2Coords);
 
                     const cachedDataForCurrentFlexibility = cachedCities.find(
-                        (cachedCity) => cachedCity.flexibility === flexibility
+                        (cachedCity) =>
+                            cachedCity.flexibility === flexibility &&
+                            cachedCity.person1Zip === person1Zip &&
+                            cachedCity.person2Zip === person2Zip
                     );
 
                     if (cachedDataForCurrentFlexibility) {
                         setMiddleCityList(
                             cachedDataForCurrentFlexibility.cities
-                        );
-                        setMiddleCity(
-                            cachedDataForCurrentFlexibility.cities[0].address
                         );
                         setIsLoading(false);
                     } else {
@@ -394,7 +394,6 @@ const Results: React.FC = () => {
 
                         setMiddleCityList(allCities);
                         if (allCities.length > 0) {
-                            setMiddleCity(allCities[0].address);
                             const newCachedCityData = {
                                 flexibility,
                                 person1Zip,
@@ -405,18 +404,15 @@ const Results: React.FC = () => {
                                 ...cachedCities,
                                 newCachedCityData,
                             ]);
-                            localStorage.setItem(
-                                `${person1Zip}-${person2Zip}`,
-                                JSON.stringify(newCachedCityData)
-                            );
-                        } else {
-                            presentToast("bottom");
                         }
                         setIsLoading(false);
                     }
                 }
             } catch (error) {
                 console.error("Error: ", error);
+                setMiddleCityList([]);
+                setIsLoading(false);
+                presentToast("bottom");
             }
         };
 
@@ -426,7 +422,6 @@ const Results: React.FC = () => {
     const findAnother = (index: number) => {
         const nextIndex = (index + 1) % middleCityList.length; // Calculate the next index cyclically
         setIndex(nextIndex);
-        setMiddleCity(middleCityList[index].address);
     };
 
     return (
@@ -445,7 +440,7 @@ const Results: React.FC = () => {
             </IonHeader>
             <IonContent className="ion-padding">
                 <div className="results-container">
-                    {middleCity ? (
+                    {middleCityList[index] ? (
                         <>
                             <IonGrid>
                                 <IonRow>
@@ -562,6 +557,7 @@ const Results: React.FC = () => {
                         </div>
                     )}
                 </div>
+                <IonLoading isOpen={isLoading} />
             </IonContent>
         </IonPage>
     );

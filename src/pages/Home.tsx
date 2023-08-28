@@ -9,6 +9,7 @@ import {
 import LocationInput from "../components/LocationInput";
 import { useState } from "react";
 import { useHistory } from "react-router-dom";
+import React from "react";
 
 const Home = () => {
     const [person1Zip, setPerson1Zip] = useState("");
