@@ -39,7 +39,6 @@ setupIonicReact();
 const App: React.FC = () => (
   <IonApp>
     <IonReactRouter>
-      <IonTabs>
         <IonRouterOutlet>
           <Route exact path="/home">
             <Home />
@@ -51,17 +50,6 @@ const App: React.FC = () => (
             <Redirect to="/home" />
           </Route>
         </IonRouterOutlet>
-        <IonTabBar slot="bottom">
-          <IonTabButton tab="home" href="/home">
-            <IonIcon aria-hidden="true" icon={compassOutline} />
-            <IonLabel>Tab 1</IonLabel>
-          </IonTabButton>
-          <IonTabButton tab="results" href="/results">
-            <IonIcon aria-hidden="true" icon={listOutline} />
-            <IonLabel>Results</IonLabel>
-          </IonTabButton>
-        </IonTabBar>
-      </IonTabs>
     </IonReactRouter>
   </IonApp>
 );
