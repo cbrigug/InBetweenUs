@@ -213,6 +213,7 @@ const Results: React.FC = () => {
         const fetchCoords = async () => {
             try {
                 if (personAZip && personBZip) {
+                    setIndex(0);
                     setIsLoading(true);
                     const personACoords = await zipToCoords(personAZip);
                     const personBCoords = await zipToCoords(personBZip);
@@ -350,7 +351,6 @@ const Results: React.FC = () => {
                                     <IonCol>
                                         <IonRange
                                             onIonChange={(e) => {
-                                                setIndex(0);
                                                 setFlexibility(
                                                     e.detail.value as number
                                                 );
