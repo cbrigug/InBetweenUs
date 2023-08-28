@@ -28,6 +28,7 @@ import GoogleMapsLink from "../components/GoogleMapsLink";
 import { convertSecondsToHoursMinutes } from "../utils/timeUtils";
 import { environment } from "../../environment.dev";
 import Map from "../components/Map";
+import React from "react";
 
 interface ResultsProps {
     person1Zip: string;
@@ -249,7 +250,7 @@ async function getCitiesByRadius(
         });
     }
 
-    let cities = [];
+    let cities: any[] = [];
     const newCoords = addDistanceToCenterCoords(
         personA,
         personB,
@@ -261,7 +262,7 @@ async function getCitiesByRadius(
     for (const coords of [newCoords.halfOne, newCoords.halfTwo]) {
         const url = `https://revgeocode.search.hereapi.com/v1/revgeocode?in=circle:${coords.latitude},${coords.longitude};r=${radius}&types=city&limit=20&apiKey=${HERE_API_KEY}`;
         const response = await axios.get(url);
-        // push every third city
+        // push every tenth city
         cities.push(
             ...response.data.items.filter((item: any, index: number) => {
                 return index % 10 === 0;
