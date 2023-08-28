@@ -53,7 +53,7 @@ interface ZipToCoordsCache {
     [zip: string]: Coordinates;
 }
 const zipToCoordsCache: ZipToCoordsCache = {};
-const cachedDriveData = localStorage.getItem('driveDataCache');
+const cachedDriveData = localStorage.getItem("driveDataCache");
 const driveDataCache = cachedDriveData ? JSON.parse(cachedDriveData) : {};
 
 const zipToCoords = async (zip: string) => {
@@ -111,7 +111,7 @@ async function getDriveData(start: string, end: string): Promise<DrivingTime> {
     const distance = response.data.rows[0].elements[0].distance?.value;
     driveDataCache[`${start}-${end}`] = { time: drivingTime, distance };
 
-    localStorage.setItem('driveDataCache', JSON.stringify(driveDataCache));
+    localStorage.setItem("driveDataCache", JSON.stringify(driveDataCache));
 
     return { time: drivingTime, distance: distance };
 }
