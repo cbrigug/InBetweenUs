@@ -2,7 +2,6 @@ import {
     IonAvatar,
     IonButton,
     IonButtons,
-    IonCol,
     IonContent,
     IonGrid,
     IonHeader,
@@ -16,7 +15,9 @@ import {
     IonToolbar,
 } from "@ionic/react";
 import { locateOutline } from "ionicons/icons";
-import React from "react";
+import React, { useState } from "react";
+import ImportContact from "./ImportContact";
+import { ContactPayload } from "@capacitor-community/contacts";
 
 interface AddPersonModalProps {
     isModalOpen: boolean;
@@ -33,6 +34,8 @@ const AddPersonModal: React.FC<AddPersonModalProps> = ({
     input,
     modal,
 }) => {
+    const [contact, setContact] = useState<ContactPayload | null>(null);
+
     return (
         <IonModal isOpen={isModalOpen} onDidDismiss={toggleModal} ref={modal}>
             <IonHeader>
@@ -54,7 +57,12 @@ const AddPersonModal: React.FC<AddPersonModalProps> = ({
                 <IonGrid>
                     <IonRow className="ion-justify-content-center">
                         <IonAvatar style={{ height: "30%", width: "30%" }}>
-                            <img src="https://ionicframework.com/docs/img/demos/avatar.svg" />
+                            <img
+                                src={`${
+                                    contact?.image?.base64String ??
+                                    "https://ionicframework.com/docs/img/demos/avatar.svg"
+                                }`}
+                            />
                         </IonAvatar>
                     </IonRow>
                     <IonRow className="ion-justify-content-center">
@@ -65,22 +73,55 @@ const AddPersonModal: React.FC<AddPersonModalProps> = ({
                     <IonInput
                         ref={input}
                         type="text"
-                        placeholder="e.g., John Doe"
+                        labelPlacement="floating"
                         label="Name"
                         required={true}
+                        value={contact?.name?.display ?? ""}
                     />
                 </IonItem>
                 <IonItem>
                     <IonInput
                         ref={input}
                         type="text"
-                        placeholder="e.g., 123 Main Street"
+                        labelPlacement="floating"
                         label="Address"
                         required={true}
+                        value={contact?.postalAddresses?.[0].street ?? ""}
                     />
                     <IonIcon icon={locateOutline} slot="end" />
                 </IonItem>
+                <IonItem>
+                    <IonInput
+                        ref={input}
+                        type="text"
+                        labelPlacement="floating"
+                        label="City"
+                        required={true}
+                        value={contact?.postalAddresses?.[0].city ?? ""}
+                    />
+                </IonItem>
+                <IonItem>
+                    <IonInput
+                        ref={input}
+                        type="text"
+                        labelPlacement="floating"
+                        label="Country"
+                        required={true}
+                        value={contact?.postalAddresses?.[0].country ?? ""}
+                    />
+                </IonItem>
+                <IonItem>
+                    <IonInput
+                        ref={input}
+                        type="text"
+                        labelPlacement="floating"
+                        label="Zip Code"
+                        required={true}
+                        value={contact?.postalAddresses?.[0].postcode ?? ""}
+                    />
+                </IonItem>
             </IonContent>
+            <ImportContact setContact={setContact} />
         </IonModal>
     );
 };

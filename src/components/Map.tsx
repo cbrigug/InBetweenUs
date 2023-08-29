@@ -1,6 +1,6 @@
 import { GoogleMap, LatLngBounds } from '@capacitor/google-maps';
 import { useEffect, useRef } from 'react';
-import { Coordinates } from '../pages/Results';
+import { Coordinates } from '../utils/distanceUtils';
 import { LatLng } from '@capacitor/google-maps/dist/typings/definitions';
 import { environment } from '../../environment.dev';
 
