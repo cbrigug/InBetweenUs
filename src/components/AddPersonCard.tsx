@@ -1,3 +1,4 @@
+import React, { useState, useRef } from "react";
 import {
     IonCard,
     IonCol,
@@ -8,8 +9,8 @@ import {
     IonRow,
 } from "@ionic/react";
 import { addCircleOutline } from "ionicons/icons";
-import React from "react";
 import { createUseStyles } from "react-jss";
+import AddPersonModal from "./AddPersonModal";
 
 interface AddPersonCardProps {
     isPersonA: boolean;
@@ -38,28 +39,57 @@ const useStyles = createUseStyles({
 const AddPersonCard: React.FC<AddPersonCardProps> = ({ isPersonA }) => {
     const classes = useStyles();
 
+    const modal = useRef<HTMLIonModalElement>(null);
+    const modalInput = useRef<HTMLIonInputElement>(null);
+    const [isModalOpen, setIsModalOpen] = useState(false);
+
+    const toggleModal = () => {
+        setIsModalOpen(!isModalOpen);
+    };
+
+    const confirmModal = () => {
+        modal.current?.dismiss(modalInput.current?.value, "confirm");
+        console.log(modalInput.current?.value);
+    };
+
     return (
-        <IonCard
-            className={`ion-no-margin ${classes.card}`}
-            color={isPersonA ? "primary" : "lightblue"}
-            button={true}
-            style={{ marginTop: isPersonA ? "0px" : "15px" }}
-        >
-            <IonRippleEffect />
-            <IonGrid className={classes.grid}>
-                <IonRow className="ion-text-center" style={{ height: "100%" }}>
-                    <IonCol className="ion-align-self-center">
-                        <IonLabel className={classes.label}>Person A</IonLabel>
-                        <br />
-                        <IonIcon
-                            icon={addCircleOutline}
-                            color="light"
-                            className={classes.icon}
-                        />
-                    </IonCol>
-                </IonRow>
-            </IonGrid>
-        </IonCard>
+        <>
+            <IonCard
+                className={`ion-no-margin ${classes.card}`}
+                color={isPersonA ? "primary" : "lightblue"}
+                button={true}
+                style={{ marginTop: isPersonA ? "0px" : "15px" }}
+                onClick={toggleModal}
+            >
+                <IonRippleEffect />
+                <IonGrid className={classes.grid}>
+                    <IonRow
+                        className="ion-text-center"
+                        style={{ height: "100%" }}
+                    >
+                        <IonCol className="ion-align-self-center">
+                            <IonLabel className={classes.label}>
+                                Person A
+                            </IonLabel>
+                            <br />
+                            <IonIcon
+                                icon={addCircleOutline}
+                                color="light"
+                                className={classes.icon}
+                            />
+                        </IonCol>
+                    </IonRow>
+                </IonGrid>
+            </IonCard>
+
+            <AddPersonModal
+                isModalOpen={isModalOpen}
+                toggleModal={toggleModal}
+                confirm={confirmModal}
+                input={modalInput}
+                modal={modal}
+            />
+        </>
     );
 };
 
