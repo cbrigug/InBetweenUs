@@ -69,7 +69,7 @@ const ImportContact: React.FC<ImportContactProps> = ({ setContact }) => {
         >
             <IonFabButton
                 onClick={retrieveContact}
-                style={{ height: "75px", width: "75px" }}
+                style={{ height: "70px", width: "70px" }}
             >
                 <IonIcon icon={cloudUploadOutline} size="large"></IonIcon>
             </IonFabButton>
