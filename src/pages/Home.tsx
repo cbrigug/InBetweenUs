@@ -9,7 +9,7 @@ import {
 import { useState } from "react";
 import { useHistory } from "react-router-dom";
 import React from "react";
-import AddPersonCard from "../components/AddPersonCard";
+import AddPersonCard from "../components/PersonCard/AddPersonCard";
 
 const Home = () => {
     const [personAZip, setpersonAZip] = useState("");

@@ -3,6 +3,7 @@ import {
     IonBadge,
     IonButton,
     IonButtons,
+    IonCol,
     IonContent,
     IonGrid,
     IonHeader,
@@ -17,7 +18,7 @@ import {
 } from "@ionic/react";
 import { locateOutline } from "ionicons/icons";
 import React, { useState, useEffect } from "react";
-import ImportContact from "./ImportContact";
+import ImportContact from "../ImportContact";
 import { ContactPayload } from "@capacitor-community/contacts";
 import { Camera, CameraResultType, CameraSource } from "@capacitor/camera";
 
@@ -25,8 +26,9 @@ export type FormDataType = {
     name: string;
     address: string;
     city: string;
-    country: string;
+    state: string;
     zipCode: string;
+    country: string;
 };
 
 interface AddPersonModalProps {
@@ -49,13 +51,16 @@ const AddPersonModal: React.FC<AddPersonModalProps> = ({
     const [name, setName] = useState("");
     const [address, setAddress] = useState("");
     const [city, setCity] = useState("");
-    const [country, setCountry] = useState("");
+    const [state, setState] = useState("");
     const [zipCode, setZipCode] = useState("");
+    const [country, setCountry] = useState("");
     const [isFormValid, setIsFormValid] = useState(false);
 
     useEffect(() => {
-        setIsFormValid(!!name && !!address && !!city && !!country && !!zipCode);
-    }, [name, address, city, country, zipCode]);
+        setIsFormValid(
+            !!name && !!address && !!city && !!state && !!zipCode && !!country
+        );
+    }, [name, address, city, state, zipCode, country]);
 
     const handleConfirm = () => {
         if (!isFormValid) return;
@@ -64,8 +69,9 @@ const AddPersonModal: React.FC<AddPersonModalProps> = ({
             name,
             address,
             city,
-            country,
+            state,
             zipCode,
+            country,
         };
         confirm(formData);
     };
@@ -90,8 +96,9 @@ const AddPersonModal: React.FC<AddPersonModalProps> = ({
             setName(contact.name?.display ?? "");
             setAddress(contact.postalAddresses?.[0]?.street ?? "");
             setCity(contact.postalAddresses?.[0]?.city ?? "");
-            setCountry(contact.postalAddresses?.[0]?.country ?? "");
+            setState(contact.postalAddresses?.[0]?.region ?? "");
             setZipCode(contact.postalAddresses?.[0]?.postcode ?? "");
+            setCountry(contact.postalAddresses?.[0]?.country ?? "");
         }
     }, [contact]);
 
@@ -166,14 +173,46 @@ const AddPersonModal: React.FC<AddPersonModalProps> = ({
                     />
                     <IonIcon icon={locateOutline} slot="end" />
                 </IonItem>
+                <IonGrid className="ion-no-padding">
+                    <IonRow>
+                        <IonCol size="8">
+                            <IonItem>
+                                <IonInput
+                                    type="text"
+                                    labelPlacement="floating"
+                                    label="City"
+                                    value={city}
+                                    placeholder="required"
+                                    onIonInput={(e) =>
+                                        setCity(e.target.value as string)
+                                    }
+                                />
+                            </IonItem>
+                        </IonCol>
+                        <IonCol size="4">
+                            <IonItem>
+                                <IonInput
+                                    type="text"
+                                    labelPlacement="floating"
+                                    label="State"
+                                    value={state}
+                                    placeholder="required"
+                                    onIonInput={(e) =>
+                                        setState(e.target.value as string)
+                                    }
+                                />
+                            </IonItem>
+                        </IonCol>
+                    </IonRow>
+                </IonGrid>
                 <IonItem>
                     <IonInput
                         type="text"
                         labelPlacement="floating"
-                        label="City"
-                        value={city}
+                        label="Zip Code"
+                        value={zipCode}
                         placeholder="required"
-                        onIonInput={(e) => setCity(e.target.value as string)}
+                        onIonInput={(e) => setZipCode(e.target.value as string)}
                     />
                 </IonItem>
                 <IonItem>
@@ -184,16 +223,6 @@ const AddPersonModal: React.FC<AddPersonModalProps> = ({
                         value={country}
                         placeholder="required"
                         onIonInput={(e) => setCountry(e.target.value as string)}
-                    />
-                </IonItem>
-                <IonItem>
-                    <IonInput
-                        type="text"
-                        labelPlacement="floating"
-                        label="Zip Code"
-                        value={zipCode}
-                        placeholder="required"
-                        onIonInput={(e) => setZipCode(e.target.value as string)}
                     />
                 </IonItem>
             </IonContent>
