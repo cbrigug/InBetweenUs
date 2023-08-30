@@ -10,7 +10,7 @@ import {
 } from "@ionic/react";
 import { addCircleOutline } from "ionicons/icons";
 import { createUseStyles } from "react-jss";
-import AddPersonModal from "./AddPersonModal";
+import AddPersonModal, { FormDataType } from "./AddPersonModal";
 
 interface AddPersonCardProps {
     isPersonA: boolean;
@@ -40,16 +40,15 @@ const AddPersonCard: React.FC<AddPersonCardProps> = ({ isPersonA }) => {
     const classes = useStyles();
 
     const modal = useRef<HTMLIonModalElement>(null);
-    const modalInput = useRef<HTMLIonInputElement>(null);
     const [isModalOpen, setIsModalOpen] = useState(false);
 
     const toggleModal = () => {
         setIsModalOpen(!isModalOpen);
     };
 
-    const confirmModal = () => {
-        modal.current?.dismiss(modalInput.current?.value, "confirm");
-        console.log(modalInput.current?.value);
+    const confirmModal = (formData: FormDataType) => {
+        modal.current?.dismiss();
+        console.log(formData);
     };
 
     return (
@@ -86,7 +85,6 @@ const AddPersonCard: React.FC<AddPersonCardProps> = ({ isPersonA }) => {
                 isModalOpen={isModalOpen}
                 toggleModal={toggleModal}
                 confirm={confirmModal}
-                input={modalInput}
                 modal={modal}
             />
         </>

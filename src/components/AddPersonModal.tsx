@@ -21,11 +21,18 @@ import ImportContact from "./ImportContact";
 import { ContactPayload } from "@capacitor-community/contacts";
 import { Camera, CameraResultType, CameraSource } from "@capacitor/camera";
 
+export type FormDataType = {
+    name: string;
+    address: string;
+    city: string;
+    country: string;
+    zipCode: string;
+};
+
 interface AddPersonModalProps {
     isModalOpen: boolean;
     toggleModal: () => void;
-    confirm: () => void;
-    input: React.RefObject<HTMLIonInputElement>;
+    confirm: (formData: FormDataType) => void;
     modal: React.RefObject<HTMLIonModalElement>;
 }
 
@@ -33,11 +40,35 @@ const AddPersonModal: React.FC<AddPersonModalProps> = ({
     isModalOpen,
     toggleModal,
     confirm,
-    input,
     modal,
 }) => {
     const [contact, setContact] = useState<ContactPayload | null>(null);
     const [customPhoto, setCustomPhoto] = useState<string | null>(null);
+
+    // Form fields
+    const [name, setName] = useState("");
+    const [address, setAddress] = useState("");
+    const [city, setCity] = useState("");
+    const [country, setCountry] = useState("");
+    const [zipCode, setZipCode] = useState("");
+    const [isFormValid, setIsFormValid] = useState(false);
+
+    useEffect(() => {
+        setIsFormValid(!!name && !!address && !!city && !!country && !!zipCode);
+    }, [name, address, city, country, zipCode]);
+
+    const handleConfirm = () => {
+        if (!isFormValid) return;
+
+        const formData: FormDataType = {
+            name,
+            address,
+            city,
+            country,
+            zipCode,
+        };
+        confirm(formData);
+    };
 
     const getCameraPhoto = async () => {
         const photo = await Camera.getPhoto({
@@ -56,6 +87,11 @@ const AddPersonModal: React.FC<AddPersonModalProps> = ({
     useEffect(() => {
         if (contact) {
             setCustomPhoto(contact.image?.base64String ?? null);
+            setName(contact.name?.display ?? "");
+            setAddress(contact.postalAddresses?.[0]?.street ?? "");
+            setCity(contact.postalAddresses?.[0]?.city ?? "");
+            setCountry(contact.postalAddresses?.[0]?.country ?? "");
+            setZipCode(contact.postalAddresses?.[0]?.postcode ?? "");
         }
     }, [contact]);
 
@@ -70,7 +106,11 @@ const AddPersonModal: React.FC<AddPersonModalProps> = ({
                     </IonButtons>
                     <IonTitle className="ion-text-center">Add Person</IonTitle>
                     <IonButtons slot="end">
-                        <IonButton strong={true} onClick={() => confirm()}>
+                        <IonButton
+                            strong={true}
+                            onClick={handleConfirm}
+                            disabled={!isFormValid}
+                        >
                             Confirm
                         </IonButton>
                     </IonButtons>
@@ -107,53 +147,53 @@ const AddPersonModal: React.FC<AddPersonModalProps> = ({
                 </IonGrid>
                 <IonItem>
                     <IonInput
-                        ref={input}
                         type="text"
                         labelPlacement="floating"
                         label="Name"
-                        required={true}
-                        value={contact?.name?.display ?? ""}
+                        value={name}
+                        placeholder="required"
+                        onIonInput={(e) => setName(e.target.value as string)}
                     />
                 </IonItem>
                 <IonItem>
                     <IonInput
-                        ref={input}
                         type="text"
                         labelPlacement="floating"
                         label="Address"
-                        required={true}
-                        value={contact?.postalAddresses?.[0].street ?? ""}
+                        value={address}
+                        placeholder="required"
+                        onIonInput={(e) => setAddress(e.target.value as string)}
                     />
                     <IonIcon icon={locateOutline} slot="end" />
                 </IonItem>
                 <IonItem>
                     <IonInput
-                        ref={input}
                         type="text"
                         labelPlacement="floating"
                         label="City"
-                        required={true}
-                        value={contact?.postalAddresses?.[0].city ?? ""}
+                        value={city}
+                        placeholder="required"
+                        onIonInput={(e) => setCity(e.target.value as string)}
                     />
                 </IonItem>
                 <IonItem>
                     <IonInput
-                        ref={input}
                         type="text"
                         labelPlacement="floating"
                         label="Country"
-                        required={true}
-                        value={contact?.postalAddresses?.[0].country ?? ""}
+                        value={country}
+                        placeholder="required"
+                        onIonInput={(e) => setCountry(e.target.value as string)}
                     />
                 </IonItem>
                 <IonItem>
                     <IonInput
-                        ref={input}
                         type="text"
                         labelPlacement="floating"
                         label="Zip Code"
-                        required={true}
-                        value={contact?.postalAddresses?.[0].postcode ?? ""}
+                        value={zipCode}
+                        placeholder="required"
+                        onIonInput={(e) => setZipCode(e.target.value as string)}
                     />
                 </IonItem>
             </IonContent>
