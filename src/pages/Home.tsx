@@ -5,11 +5,13 @@ import {
     IonTitle,
     IonToolbar,
     IonGrid,
+    IonRow,
 } from "@ionic/react";
 import { useState } from "react";
 import { useHistory } from "react-router-dom";
 import React from "react";
 import AddPersonCard from "../components/PersonCard/AddPersonCard";
+import PersonCard from "../components/PersonCard/PersonCard";
 
 const Home = () => {
     const [personAZip, setpersonAZip] = useState("");
@@ -42,8 +44,8 @@ const Home = () => {
             </IonHeader>
             <IonContent className="ion-padding">
                 <IonGrid style={{ height: "100%" }}>
-                    <AddPersonCard isPersonA={true} />
-                    <AddPersonCard isPersonA={false} />
+                    <PersonCard isPersonA={true} />
+                    <PersonCard isPersonA={false} />
                 </IonGrid>
             </IonContent>
         </IonPage>

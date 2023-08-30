@@ -10,10 +10,12 @@ import {
 } from "@ionic/react";
 import { addCircleOutline } from "ionicons/icons";
 import { createUseStyles } from "react-jss";
-import AddPersonModal, { FormDataType } from "./AddPersonModal";
+import AddPersonModal from "./AddPersonModal";
+import { ModalProps } from "./PersonCard";
 
 interface AddPersonCardProps {
     isPersonA: boolean;
+    modal: ModalProps;
 }
 
 const useStyles = createUseStyles({
@@ -36,20 +38,8 @@ const useStyles = createUseStyles({
     },
 });
 
-const AddPersonCard: React.FC<AddPersonCardProps> = ({ isPersonA }) => {
+const AddPersonCard: React.FC<AddPersonCardProps> = ({ isPersonA, modal }) => {
     const classes = useStyles();
-
-    const modal = useRef<HTMLIonModalElement>(null);
-    const [isModalOpen, setIsModalOpen] = useState(false);
-
-    const toggleModal = () => {
-        setIsModalOpen(!isModalOpen);
-    };
-
-    const confirmModal = (formData: FormDataType) => {
-        modal.current?.dismiss();
-        console.log(formData);
-    };
 
     return (
         <>
@@ -57,8 +47,8 @@ const AddPersonCard: React.FC<AddPersonCardProps> = ({ isPersonA }) => {
                 className={`ion-no-margin ${classes.card}`}
                 color={isPersonA ? "primary" : "lightblue"}
                 button={true}
+                onClick={modal.toggleModal}
                 style={{ marginTop: isPersonA ? "0px" : "15px" }}
-                onClick={toggleModal}
             >
                 <IonRippleEffect />
                 <IonGrid className={classes.grid}>
@@ -70,7 +60,6 @@ const AddPersonCard: React.FC<AddPersonCardProps> = ({ isPersonA }) => {
                             <IonLabel className={classes.label}>
                                 Person A
                             </IonLabel>
-                            <br />
                             <IonIcon
                                 icon={addCircleOutline}
                                 color="light"
@@ -82,10 +71,10 @@ const AddPersonCard: React.FC<AddPersonCardProps> = ({ isPersonA }) => {
             </IonCard>
 
             <AddPersonModal
-                isModalOpen={isModalOpen}
-                toggleModal={toggleModal}
-                confirm={confirmModal}
-                modal={modal}
+                isModalOpen={modal.isModalOpen}
+                toggleModal={modal.toggleModal}
+                confirm={modal.confirmModal}
+                modal={modal.modal}
             />
         </>
     );
