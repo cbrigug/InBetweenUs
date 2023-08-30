@@ -75,8 +75,10 @@ const PersonDetailsCard: React.FC<PersonDetailsCardProps> = ({
                                     }}
                                 >
                                     <img
-                                        src="https://ionicframework.com/docs/img/demos/avatar.svg"
-                                        alt="avatar"
+                                        src={`${
+                                            formData.photo ??
+                                            "https://ionicframework.com/docs/img/demos/avatar.svg"
+                                        }`}
                                     />
                                 </IonAvatar>
                             </IonCol>

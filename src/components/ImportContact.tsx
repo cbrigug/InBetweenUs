@@ -37,8 +37,8 @@ const ImportContact: React.FC<ImportContactProps> = ({ setContact }) => {
     const retrieveContact = async () => {
         const projection = {
             name: true,
-            postalAddresses: true,
             image: true,
+            postalAddresses: true,
         };
 
         try {
@@ -48,7 +48,10 @@ const ImportContact: React.FC<ImportContactProps> = ({ setContact }) => {
 
             setContact(contact);
             let fieldsFound = contact.name ? 1 : 0;
-            // otherwise count the number of address fields found
+            // otherwise count the number of other fields found
+            if (contact.image) {
+                fieldsFound++;
+            }
             for (const prop of addressFields) {
                 if (contact.postalAddresses?.[0][prop]) {
                     fieldsFound++;

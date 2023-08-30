@@ -29,6 +29,7 @@ export type FormDataType = {
     state: string;
     zipCode: string;
     country: string;
+    photo: string | null;
 };
 
 interface AddPersonModalProps {
@@ -45,7 +46,7 @@ const AddPersonModal: React.FC<AddPersonModalProps> = ({
     modal,
 }) => {
     const [contact, setContact] = useState<ContactPayload | null>(null);
-    const [customPhoto, setCustomPhoto] = useState<string | null>(null);
+    const [photo, setPhoto] = useState<string | null>(null);
 
     // Form fields
     const [name, setName] = useState("");
@@ -72,6 +73,7 @@ const AddPersonModal: React.FC<AddPersonModalProps> = ({
             state,
             zipCode,
             country,
+            photo,
         };
         confirm(formData);
     };
@@ -87,12 +89,12 @@ const AddPersonModal: React.FC<AddPersonModalProps> = ({
         // baseUrl to be used in an <img> element to display the image
         // we need to include the file extension here as well
         const imageUrl = `data:image/${photo.format};base64,${photo.base64String}`;
-        setCustomPhoto(imageUrl ?? null);
+        setPhoto(imageUrl ?? null);
     };
 
     useEffect(() => {
         if (contact) {
-            setCustomPhoto(contact.image?.base64String ?? null);
+            setPhoto(contact.image?.base64String ?? null);
             setName(contact.name?.display ?? "");
             setAddress(contact.postalAddresses?.[0]?.street ?? "");
             setCity(contact.postalAddresses?.[0]?.city ?? "");
@@ -137,7 +139,7 @@ const AddPersonModal: React.FC<AddPersonModalProps> = ({
                         >
                             <img
                                 src={`${
-                                    customPhoto ??
+                                    photo ??
                                     "https://ionicframework.com/docs/img/demos/avatar.svg"
                                 }`}
                             />
