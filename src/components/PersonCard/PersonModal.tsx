@@ -32,29 +32,33 @@ export type FormDataType = {
     photo: string | null;
 };
 
-interface AddPersonModalProps {
+export interface PersonModalProps {
     isModalOpen: boolean;
     toggleModal: () => void;
     confirm: (formData: FormDataType) => void;
     modal: React.RefObject<HTMLIonModalElement>;
+    isDetails: boolean;
+    formData?: FormDataType;
 }
 
-const AddPersonModal: React.FC<AddPersonModalProps> = ({
+const PersonModal: React.FC<PersonModalProps> = ({
     isModalOpen,
     toggleModal,
     confirm,
     modal,
+    isDetails,
+    formData,
 }) => {
     const [contact, setContact] = useState<ContactPayload | null>(null);
     const [photo, setPhoto] = useState<string | null>(null);
 
     // Form fields
-    const [name, setName] = useState("");
-    const [address, setAddress] = useState("");
-    const [city, setCity] = useState("");
-    const [state, setState] = useState("");
-    const [zipCode, setZipCode] = useState("");
-    const [country, setCountry] = useState("");
+    const [name, setName] = useState(formData?.name ?? "");
+    const [address, setAddress] = useState(formData?.address ?? "");
+    const [city, setCity] = useState(formData?.city ?? "");
+    const [state, setState] = useState(formData?.state ?? "");
+    const [zipCode, setZipCode] = useState(formData?.zipCode ?? "");
+    const [country, setCountry] = useState(formData?.country ?? "");
     const [isFormValid, setIsFormValid] = useState(false);
 
     useEffect(() => {
@@ -62,6 +66,19 @@ const AddPersonModal: React.FC<AddPersonModalProps> = ({
             !!name && !!address && !!city && !!state && !!zipCode && !!country
         );
     }, [name, address, city, state, zipCode, country]);
+
+    const handleCancel = () => {
+        // reset to initial state values
+        setName(formData?.name ?? "");
+        setAddress(formData?.address ?? "");
+        setCity(formData?.city ?? "");
+        setState(formData?.state ?? "");
+        setZipCode(formData?.zipCode ?? "");
+        setCountry(formData?.country ?? "");
+        setPhoto(formData?.photo ?? null);
+
+        modal.current?.dismiss();
+    }
 
     const handleConfirm = () => {
         if (!isFormValid) return;
@@ -109,11 +126,13 @@ const AddPersonModal: React.FC<AddPersonModalProps> = ({
             <IonHeader>
                 <IonToolbar>
                     <IonButtons slot="start">
-                        <IonButton onClick={() => modal.current?.dismiss()}>
+                        <IonButton onClick={handleCancel}>
                             Cancel
                         </IonButton>
                     </IonButtons>
-                    <IonTitle className="ion-text-center">Add Person</IonTitle>
+                    <IonTitle className="ion-text-center">
+                        {isDetails ? "Edit Person" : "Add Person"}
+                    </IonTitle>
                     <IonButtons slot="end">
                         <IonButton
                             strong={true}
@@ -233,4 +252,4 @@ const AddPersonModal: React.FC<AddPersonModalProps> = ({
     );
 };
 
-export default AddPersonModal;
+export default PersonModal;

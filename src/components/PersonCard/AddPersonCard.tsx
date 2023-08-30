@@ -10,12 +10,11 @@ import {
 } from "@ionic/react";
 import { addCircleOutline } from "ionicons/icons";
 import { createUseStyles } from "react-jss";
-import AddPersonModal from "./AddPersonModal";
-import { ModalProps } from "./PersonCard";
+import PersonModal, { PersonModalProps } from "./PersonModal";
 
 interface AddPersonCardProps {
     isPersonA: boolean;
-    modal: ModalProps;
+    modal: PersonModalProps;
 }
 
 const useStyles = createUseStyles({
@@ -58,7 +57,7 @@ const AddPersonCard: React.FC<AddPersonCardProps> = ({ isPersonA, modal }) => {
                     >
                         <IonCol className="ion-align-self-center">
                             <IonLabel className={classes.label}>
-                                Person A
+                                {isPersonA ? "Person A" : "Person B"}
                             </IonLabel>
                             <IonIcon
                                 icon={addCircleOutline}
@@ -70,11 +69,12 @@ const AddPersonCard: React.FC<AddPersonCardProps> = ({ isPersonA, modal }) => {
                 </IonGrid>
             </IonCard>
 
-            <AddPersonModal
+            <PersonModal
                 isModalOpen={modal.isModalOpen}
                 toggleModal={modal.toggleModal}
-                confirm={modal.confirmModal}
+                confirm={modal.confirm}
                 modal={modal.modal}
+                isDetails={modal.isDetails}
             />
         </>
     );
