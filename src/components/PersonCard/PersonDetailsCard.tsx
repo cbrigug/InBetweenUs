@@ -1,7 +1,19 @@
 import React from "react";
 import { FormDataType } from "./AddPersonModal";
 import { createUseStyles } from "react-jss";
-import { IonCard } from "@ionic/react";
+import {
+    IonAvatar,
+    IonCard,
+    IonCardContent,
+    IonCardHeader,
+    IonCardTitle,
+    IonCol,
+    IonGrid,
+    IonLabel,
+    IonRippleEffect,
+    IonRow,
+    IonText,
+} from "@ionic/react";
 
 interface PersonDetailsCardProps {
     formData: FormDataType;
@@ -14,30 +26,74 @@ const useStyles = createUseStyles({
         borderRadius: "50px",
     },
     label: {
-        fontSize: "40px",
+        fontSize: "36px",
         fontWeight: "bold",
+        overflow: "hidden",
+        WebkitBoxOrient: "vertical",
+        WebkitLineClamp: 2,
+        display: "-webkit-box",
     },
-    icon: {
-        fontSize: "170px",
-        "--ionicon-stroke-width": "8px",
-    },
-    grid: {
-        height: "100%",
-        width: "100%",
-        position: "absolute",
+    text: {
+        fontSize: "25px",
+        overflow: "hidden",
+        WebkitBoxOrient: "vertical",
+        WebkitLineClamp: 3,
+        display: "-webkit-box",
     },
 });
 
-const PersonDetailsCard: React.FC<PersonDetailsCardProps> = ({ isPersonA }) => {
+const PersonDetailsCard: React.FC<PersonDetailsCardProps> = ({
+    formData,
+    isPersonA,
+}) => {
     const classes = useStyles();
 
     return (
         <IonCard
             className={`ion-no-margin ${classes.card}`}
-            color={isPersonA ? "primary" : "lightblue"}
+            color={isPersonA ? "lightblue" : "primary"}
             button={true}
             style={{ marginTop: isPersonA ? "0px" : "15px" }}
-        ></IonCard>
+        >
+            <IonRippleEffect />
+            <IonCardHeader color={isPersonA ? "primary" : "lightblue"}>
+                <IonCardTitle>
+                    <IonGrid style={{ height: "90px" }}>
+                        <IonRow style={{ height: "100%" }}>
+                            <IonCol size="8" className="ion-align-self-center">
+                                <IonLabel className={classes.label}>
+                                    {formData.name}
+                                </IonLabel>
+                            </IonCol>
+                            <IonCol size="4">
+                                <IonAvatar
+                                    style={{
+                                        height: "75px",
+                                        width: "75px",
+                                        boxShadow:
+                                            "0px 5px 10px 0px rgba(0, 0, 0, 0.5)",
+                                    }}
+                                >
+                                    <img
+                                        src="https://ionicframework.com/docs/img/demos/avatar.svg"
+                                        alt="avatar"
+                                    />
+                                </IonAvatar>
+                            </IonCol>
+                        </IonRow>
+                    </IonGrid>
+                </IonCardTitle>
+            </IonCardHeader>
+            <IonCardContent>
+                <IonGrid className="ion-padding-top">
+                    <IonRow>
+                        <IonText className={classes.text}>
+                            {`${formData.address}, ${formData.city}, ${formData.state} ${formData.zipCode}`}
+                        </IonText>
+                    </IonRow>
+                </IonGrid>
+            </IonCardContent>
+        </IonCard>
     );
 };
 
