@@ -21,6 +21,8 @@ import React, { useState, useEffect } from "react";
 import ImportContact from "../ImportContact";
 import { ContactPayload } from "@capacitor-community/contacts";
 import { Camera, CameraResultType, CameraSource } from "@capacitor/camera";
+import { environment } from "../../../environment.dev";
+import { Geolocation } from "@capacitor/geolocation";
 
 export type FormDataType = {
     name: string;
@@ -40,6 +42,8 @@ export interface PersonModalProps {
     isDetails: boolean;
     formData?: FormDataType;
 }
+
+const GOOGLE_API_KEY = environment.REACT_APP_GOOGLE_API_KEY;
 
 const PersonModal: React.FC<PersonModalProps> = ({
     isModalOpen,
@@ -107,6 +111,47 @@ const PersonModal: React.FC<PersonModalProps> = ({
         // we need to include the file extension here as well
         const imageUrl = `data:image/${photo.format};base64,${photo.base64String}`;
         setPhoto(imageUrl ?? null);
+    };
+
+    const getCurrentLocation = async () => {
+        try {
+            const coordinates = await Geolocation.getCurrentPosition();
+
+            const lat = coordinates.coords.latitude;
+            const lng = coordinates.coords.longitude;
+
+            const url = `https://maps.googleapis.com/maps/api/geocode/json?latlng=${lat},${lng}&key=${GOOGLE_API_KEY}`;
+            const response = await fetch(url);
+            const data = await response.json();
+
+            const addressComponents = data.results[0].address_components;
+            const getAddressComponent = (type: string) => {
+                return (
+                    addressComponents.find((component: { types: string }) =>
+                        component.types.includes(type)
+                    )?.short_name || ""
+                );
+            };
+
+            const address = `${getAddressComponent(
+                "street_number"
+            )} ${getAddressComponent("route")}`;
+            const city = getAddressComponent("locality");
+            const state = getAddressComponent("administrative_area_level_1");
+            const zipCode = getAddressComponent("postal_code");
+            const country = getAddressComponent("country");
+
+            setAddress(address);
+            setCity(city);
+            setState(state);
+            setZipCode(zipCode);
+            setCountry(country);
+
+            // Now you can use city, state, zipCode, and country as needed
+        } catch (error) {
+            console.error("Error getting location:", error);
+            // Handle the error gracefully, e.g., show an error message to the user
+        }
     };
 
     useEffect(() => {
@@ -190,7 +235,11 @@ const PersonModal: React.FC<PersonModalProps> = ({
                         placeholder="required"
                         onIonInput={(e) => setAddress(e.target.value as string)}
                     />
-                    <IonIcon icon={locateOutline} slot="end" />
+                    <IonIcon
+                        icon={locateOutline}
+                        slot="end"
+                        onClick={getCurrentLocation}
+                    />
                 </IonItem>
                 <IonGrid className="ion-no-padding">
                     <IonRow>
