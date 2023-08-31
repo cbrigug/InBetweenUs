@@ -10,4 +10,7 @@
   #help-text {
     font-size: 16px;
   }
-  
+
+  ion-content {
+    --background: transparent;
+  }
