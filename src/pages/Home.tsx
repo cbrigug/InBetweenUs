@@ -5,34 +5,35 @@ import {
     IonTitle,
     IonToolbar,
     IonGrid,
-    IonRow,
 } from "@ionic/react";
 import { useState } from "react";
 import { useHistory } from "react-router-dom";
 import React from "react";
-import AddPersonCard from "../components/PersonCard/AddPersonCard";
 import PersonCard from "../components/PersonCard/PersonCard";
+import { FormDataType } from "../components/PersonCard/PersonModal";
+import PulsingCircle from "../components/PulsingCircle";
 
-const Home = () => {
-    const [personAZip, setpersonAZip] = useState("");
-    const [personBZip, setpersonBZip] = useState("");
+const Home: React.FC = () => {
+    const [personA, setPersonA] = useState("");
+    const [personB, setPersonB] = useState("");
     const history = useHistory();
 
-    const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
-        e.preventDefault();
+    const handleSubmit = () => {
+        console.log(personA, personB)
 
         history.push("/results", {
-            personAZip,
-            personBZip,
+            personAZip: personA,
+            personBZip: personB,
         });
     };
 
-    const handlepersonAZipChange = (location: string) => {
-        setpersonAZip(location);
-    };
-
-    const handlepersonBZipChange = (location: string) => {
-        setpersonBZip(location);
+    const handlePersonChange = (formData: FormDataType, isPersonA: boolean) => {
+        const personData = formData;
+        if (isPersonA) {
+            setPersonA(personData.zipCode);
+        } else {
+            setPersonB(personData.zipCode);
+        }
     };
 
     return (
@@ -44,8 +45,19 @@ const Home = () => {
             </IonHeader>
             <IonContent className="ion-padding">
                 <IonGrid style={{ height: "100%" }}>
-                    <PersonCard isPersonA={true} />
-                    <PersonCard isPersonA={false} />
+                    <PersonCard
+                        isPersonA={true}
+                        setPerson={(formData) =>
+                            handlePersonChange(formData, true)
+                        }
+                    />
+                    {!!personA && !!personB && <PulsingCircle navToResults={handleSubmit} />}
+                    <PersonCard
+                        isPersonA={false}
+                        setPerson={(formData) =>
+                            handlePersonChange(formData, false)
+                        }
+                    />
                 </IonGrid>
             </IonContent>
         </IonPage>

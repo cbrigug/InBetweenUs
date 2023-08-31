@@ -5,9 +5,10 @@ import AddPersonCard from "./AddPersonCard";
 
 interface PersonCardProps {
     isPersonA: boolean;
+    setPerson: (formData: FormDataType) => void;
 }
 
-const PersonCard: React.FC<PersonCardProps> = ({ isPersonA }) => {
+const PersonCard: React.FC<PersonCardProps> = ({ isPersonA, setPerson }) => {
     const [formData, setFormData] = React.useState<FormDataType | null>(null);
 
     const modal = useRef<HTMLIonModalElement>(null);
@@ -19,6 +20,7 @@ const PersonCard: React.FC<PersonCardProps> = ({ isPersonA }) => {
     const confirmModal = async (formData: FormDataType) => {
         await modal.current?.dismiss();
         setFormData(formData);
+        setPerson(formData)
     };
 
     const modalObj: PersonModalProps = {
