@@ -50,7 +50,7 @@ const PersonModal: React.FC<PersonModalProps> = ({
     formData,
 }) => {
     const [contact, setContact] = useState<ContactPayload | null>(null);
-    const [photo, setPhoto] = useState<string | null>(null);
+    const [photo, setPhoto] = useState<string | null>(formData?.photo ?? null);
 
     // Form fields
     const [name, setName] = useState(formData?.name ?? "");
@@ -78,7 +78,7 @@ const PersonModal: React.FC<PersonModalProps> = ({
         setPhoto(formData?.photo ?? null);
 
         modal.current?.dismiss();
-    }
+    };
 
     const handleConfirm = () => {
         if (!isFormValid) return;
@@ -126,9 +126,7 @@ const PersonModal: React.FC<PersonModalProps> = ({
             <IonHeader>
                 <IonToolbar>
                     <IonButtons slot="start">
-                        <IonButton onClick={handleCancel}>
-                            Cancel
-                        </IonButton>
+                        <IonButton onClick={handleCancel}>Cancel</IonButton>
                     </IonButtons>
                     <IonTitle className="ion-text-center">
                         {isDetails ? "Edit Person" : "Add Person"}
