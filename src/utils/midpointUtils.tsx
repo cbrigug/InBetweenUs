@@ -1,6 +1,6 @@
-import axios from "axios";
 import { environment } from "../../environment.dev";
 import { Coordinates } from "./distanceUtils";
+import { CapacitorHttp } from "@capacitor/core";
 
 const GOOGLE_API_KEY = environment.REACT_APP_GOOGLE_API_KEY;
 
@@ -22,8 +22,7 @@ export async function findMidpoint(
         // Construct the URL for the Directions API request
         const url = `https://maps.googleapis.com/maps/api/directions/json?origin=${startLocation.latitude},${startLocation.longitude}&destination=${destinationLocation.latitude},${destinationLocation.longitude}&mode=driving&departure_time=${departureTime}&traffic_model=optimistic&key=${GOOGLE_API_KEY}`;
 
-        // Make the API request using axios
-        const response = await axios.get(url);
+        const response = await CapacitorHttp.get({ url });
         const route = response.data.routes[0];
         let accumulatedDistance = 0;
         let furthestCoordinates: Coordinates = { latitude: 0, longitude: 0 };

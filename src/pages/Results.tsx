@@ -24,7 +24,6 @@ import {
     helpCircleOutline,
     refreshOutline,
 } from "ionicons/icons";
-import axios, { all } from "axios";
 import GoogleMapsLink from "../components/GoogleMapsLink";
 import { convertSecondsToHoursMinutes } from "../utils/timeUtils";
 import { environment } from "../../environment.dev";
@@ -34,6 +33,7 @@ import NoResultsFound from "../components/NoResultsFound";
 import { findMidpoint } from "../utils/midpointUtils";
 import { Coordinates, addDistanceToCenterCoords } from "../utils/distanceUtils";
 import { City, CityResponse } from "../interfaces/City";
+import { CapacitorHttp } from "@capacitor/core";
 
 interface ResultsProps {
     personAZip: string;
@@ -62,10 +62,10 @@ const zipToCoords = async (zip: string) => {
         if (zipToCoordsCache[zip]) {
             return zipToCoordsCache[zip];
         }
-        const response = await fetch(
-            `https://maps.googleapis.com/maps/api/geocode/json?address=${zip}&key=${GOOGLE_API_KEY}`
-        );
-        const data = await response.json();
+
+        const url = `https://maps.googleapis.com/maps/api/geocode/json?address=${zip}&key=${GOOGLE_API_KEY}`;
+        const response = await CapacitorHttp.get({ url });
+        const data = response.data;
 
         if (data.status === "OK" && data.results.length > 0) {
             const { lat, lng } = data.results[0].geometry.location;
@@ -107,7 +107,7 @@ async function getDriveData(start: string, end: string): Promise<DrivingTime> {
     if (driveDataCache[`${start}-${end}`]) {
         return driveDataCache[`${start}-${end}`];
     }
-    const response = await axios.get<DistanceMatrixResponse>(url);
+    const response = await CapacitorHttp.get({ url });;
     const drivingTime = response.data.rows[0].elements[0].duration?.value;
     const distance = response.data.rows[0].elements[0].distance?.value;
     driveDataCache[`${start}-${end}`] = { time: drivingTime, distance };
@@ -129,7 +129,7 @@ async function getCitiesByRadius(
 
     if (flexibility === 0) {
         const url = `https://revgeocode.search.hereapi.com/v1/revgeocode?in=circle:${latitude},${longitude};r=${radius}&types=city&limit=25&apiKey=${HERE_API_KEY}`;
-        const response = await axios.get(url);
+        const response = await CapacitorHttp.get({ url });
 
         return response.data.items.filter((item: City, index: number) => {
             return index % 4 === 0;
@@ -147,7 +147,7 @@ async function getCitiesByRadius(
 
     for (const coords of [newCoords.halfOne, newCoords.halfTwo]) {
         const url = `https://revgeocode.search.hereapi.com/v1/revgeocode?in=circle:${coords.latitude},${coords.longitude};r=${radius}&types=city&limit=20&apiKey=${HERE_API_KEY}`;
-        const response = await axios.get(url);
+        const response = await CapacitorHttp.get({ url });
         // push every tenth city
         cities.push(
             ...response.data.items.filter(

@@ -23,6 +23,7 @@ import { ContactPayload } from "@capacitor-community/contacts";
 import { Camera, CameraResultType, CameraSource } from "@capacitor/camera";
 import { environment } from "../../../environment.dev";
 import { Geolocation } from "@capacitor/geolocation";
+import { CapacitorHttp } from "@capacitor/core";
 
 export type FormDataType = {
     name: string;
@@ -121,8 +122,11 @@ const PersonModal: React.FC<PersonModalProps> = ({
             const lng = coordinates.coords.longitude;
 
             const url = `https://maps.googleapis.com/maps/api/geocode/json?latlng=${lat},${lng}&key=${GOOGLE_API_KEY}`;
-            const response = await fetch(url);
-            const data = await response.json();
+            const options = {
+                url,
+            };
+            const response = await CapacitorHttp.get(options);
+            const data = response.data;
 
             const addressComponents = data.results[0].address_components;
             const getAddressComponent = (type: string) => {
@@ -146,11 +150,8 @@ const PersonModal: React.FC<PersonModalProps> = ({
             setState(state);
             setZipCode(zipCode);
             setCountry(country);
-
-            // Now you can use city, state, zipCode, and country as needed
         } catch (error) {
             console.error("Error getting location:", error);
-            // Handle the error gracefully, e.g., show an error message to the user
         }
     };
 
