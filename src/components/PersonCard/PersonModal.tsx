@@ -25,6 +25,7 @@ import { Camera, CameraResultType, CameraSource } from "@capacitor/camera";
 import { environment } from "../../../environment.dev";
 import { Geolocation } from "@capacitor/geolocation";
 import { CapacitorHttp } from "@capacitor/core";
+import { Coordinates } from "../../utils/distanceUtils";
 
 export type FormDataType = {
     name: string;
@@ -34,6 +35,7 @@ export type FormDataType = {
     zipCode: string;
     country: string;
     photo: string | null;
+    coordinates: Coordinates;
 };
 
 export interface PersonModalProps {
@@ -77,6 +79,8 @@ const PersonModal: React.FC<PersonModalProps> = ({
     const [country, setCountry] = useState(formData?.country ?? "");
     const [isFormValid, setIsFormValid] = useState(false);
 
+    const [coords, setCoords] = useState<Coordinates>({ latitude: 0, longitude: 0});
+
     useEffect(() => {
         setIsFormValid(
             !!name && !!address && !!city && !!state && !!zipCode && !!country
@@ -107,6 +111,7 @@ const PersonModal: React.FC<PersonModalProps> = ({
             zipCode,
             country,
             photo,
+            coordinates: coords,
         };
         confirm(formData);
     };
@@ -171,6 +176,11 @@ const PersonModal: React.FC<PersonModalProps> = ({
             setZipCode(zipCode);
             setCountry(country);
 
+            setCoords({
+                latitude: data.results[0].geometry.location.lat,
+                longitude: data.results[0].geometry.location.lng,
+            });
+
             presentToast("bottom", "Location found", "dark");
         } catch (error) {
             console.error("Error getting location:", error);
@@ -207,6 +217,12 @@ const PersonModal: React.FC<PersonModalProps> = ({
             setCity(city);
             setState(state);
             setCountry(country);
+
+            setCoords({
+                latitude: data.results[0].geometry.location.lat,
+                longitude: data.results[0].geometry.location.lng,
+            });
+
             presentToast("bottom", "Address found", "dark");
         } catch (error) {
             console.error("Error getting location:", error);
@@ -248,6 +264,12 @@ const PersonModal: React.FC<PersonModalProps> = ({
             setCity(city);
             setState(state);
             setCountry(country);
+
+            setCoords({
+                latitude: data.results[0].geometry.location.lat,
+                longitude: data.results[0].geometry.location.lng,
+            });
+
             presentToast("bottom", "Address found", "dark");
         } catch (error) {
             console.error("Error getting location:", error);

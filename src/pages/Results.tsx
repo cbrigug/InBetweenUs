@@ -34,10 +34,11 @@ import { findMidpoint } from "../utils/midpointUtils";
 import { Coordinates, addDistanceToCenterCoords } from "../utils/distanceUtils";
 import { City, CityResponse } from "../interfaces/City";
 import { CapacitorHttp } from "@capacitor/core";
+import { FormDataType } from "../components/PersonCard/PersonModal";
 
 interface ResultsProps {
-    personAZip: string;
-    personBZip: string;
+    personA: FormDataType;
+    personB: FormDataType;
 }
 
 const GOOGLE_API_KEY = environment.REACT_APP_GOOGLE_API_KEY;
@@ -45,57 +46,17 @@ const HERE_API_KEY = environment.REACT_APP_HERE_API_KEY;
 
 interface CachedCityData {
     flexibility: number;
-    personAZip: string;
-    personBZip: string;
+    personA: string;
+    personB: string;
     cities: City[];
 }
 
-interface ZipToCoordsCache {
-    [zip: string]: Coordinates;
+interface AddressToCoordsCache {
+    [key: string]: Coordinates;
 }
-const zipToCoordsCache: ZipToCoordsCache = {};
+
 const cachedDriveData = localStorage.getItem("driveDataCache");
 const driveDataCache = cachedDriveData ? JSON.parse(cachedDriveData) : {};
-
-const zipToCoords = async (zip: string) => {
-    try {
-        if (zipToCoordsCache[zip]) {
-            return zipToCoordsCache[zip];
-        }
-
-        const url = `https://maps.googleapis.com/maps/api/geocode/json?address=${zip}&key=${GOOGLE_API_KEY}`;
-        const response = await CapacitorHttp.get({ url });
-        const data = response.data;
-
-        if (data.status === "OK" && data.results.length > 0) {
-            const { lat, lng } = data.results[0].geometry.location;
-            const coords = { longitude: lng, latitude: lat };
-
-            // Cache the coordinates
-            zipToCoordsCache[zip] = coords;
-
-            return coords;
-        } else {
-            throw new Error("No coordinates found for the given zip code.");
-        }
-    } catch (error) {
-        console.error("Error converting zip code to coordinates:", error);
-        throw error;
-    }
-};
-
-interface DistanceMatrixResponse {
-    rows: {
-        elements: {
-            duration: {
-                value: number;
-            };
-            distance: {
-                value: number;
-            };
-        }[];
-    }[];
-}
 
 interface DrivingTime {
     time: number;
@@ -107,7 +68,7 @@ async function getDriveData(start: string, end: string): Promise<DrivingTime> {
     if (driveDataCache[`${start}-${end}`]) {
         return driveDataCache[`${start}-${end}`];
     }
-    const response = await CapacitorHttp.get({ url });;
+    const response = await CapacitorHttp.get({ url });
     const drivingTime = response.data.rows[0].elements[0].duration?.value;
     const distance = response.data.rows[0].elements[0].distance?.value;
     driveDataCache[`${start}-${end}`] = { time: drivingTime, distance };
@@ -167,19 +128,24 @@ async function getCitiesByRadius(
 }
 
 async function findLocationsToMeet(
-    personA: Coordinates,
-    personB: Coordinates,
+    personACoords: Coordinates,
+    personBCoords: Coordinates,
     flexibility: number
 ): Promise<City[]> {
-    const midpoint = await findMidpoint(personA, personB);
-    const cities = getCitiesByRadius(personA, personB, midpoint, flexibility);
+    const midpoint = await findMidpoint(personACoords, personBCoords);
+    const cities = getCitiesByRadius(
+        personACoords,
+        personBCoords,
+        midpoint,
+        flexibility
+    );
 
     return cities;
 }
 
 const Results: React.FC = () => {
     const location = useLocation();
-    const { personAZip, personBZip } = (location.state as ResultsProps) || {};
+    const { personA, personB } = (location.state as ResultsProps) || null;
 
     const [middleCityList, setMiddleCityList] = useState<City[]>([]);
     const [index, setIndex] = useState(0);
@@ -212,19 +178,21 @@ const Results: React.FC = () => {
     useEffect(() => {
         const fetchCoords = async () => {
             try {
-                if (personAZip && personBZip) {
+                if (personA.coordinates && personB.coordinates) {
                     setIndex(0);
                     setIsLoading(true);
-                    const personACoords = await zipToCoords(personAZip);
-                    const personBCoords = await zipToCoords(personBZip);
+                    const personACoords = personA.coordinates;
+                    const personBCoords = personB.coordinates;
                     setpersonACoords(personACoords);
                     setpersonBCoords(personBCoords);
 
                     const cachedDataForCurrentFlexibility = cachedCities.find(
                         (cachedCity) =>
                             cachedCity.flexibility === flexibility &&
-                            cachedCity.personAZip === personAZip &&
-                            cachedCity.personBZip === personBZip
+                            cachedCity.personA ===
+                                `${personA.address} ${personA.zipCode}` &&
+                            cachedCity.personB ===
+                                `${personB.address} ${personB.zipCode}`
                     );
 
                     if (cachedDataForCurrentFlexibility) {
@@ -271,8 +239,8 @@ const Results: React.FC = () => {
                         if (allCities.length > 0) {
                             const newCachedCityData = {
                                 flexibility,
-                                personAZip,
-                                personBZip,
+                                personA: `${personA.address} ${personA.zipCode}`,
+                                personB: `${personB.address} ${personB.zipCode}`,
                                 cities: allCities,
                             };
                             setCachedCities([
@@ -292,7 +260,7 @@ const Results: React.FC = () => {
         };
 
         fetchCoords();
-    }, [personAZip, personBZip, flexibility]);
+    }, [personA, personB, flexibility]);
 
     const findAnother = (index: number) => {
         const nextIndex = (index + 1) % middleCityList.length; // Calculate the next index cyclically

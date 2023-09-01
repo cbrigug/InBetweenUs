@@ -5,13 +5,13 @@ import { CapacitorHttp } from "@capacitor/core";
 const GOOGLE_API_KEY = environment.REACT_APP_GOOGLE_API_KEY;
 
 export async function findMidpoint(
-    personA: Coordinates,
-    personB: Coordinates
+    personACoords: Coordinates,
+    personBCoords: Coordinates
 ): Promise<Coordinates> {
     try {
         // Define the starting and destination locations as coordinates
-        const startLocation = personA;
-        const destinationLocation = personB;
+        const startLocation = personACoords;
+        const destinationLocation = personBCoords;
 
         // Define the departure time as next day at 4:00 AM UTC (optimal conditions)
         const currentDate = new Date();

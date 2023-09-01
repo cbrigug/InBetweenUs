@@ -13,26 +13,37 @@ import PersonCard from "../components/PersonCard/PersonCard";
 import { FormDataType } from "../components/PersonCard/PersonModal";
 import PulsingCircle from "../components/PulsingCircle";
 
+const defaultFormData: FormDataType = {
+    name: "",
+    address: "",
+    city: "",
+    state: "",
+    zipCode: "",
+    country: "",
+    coordinates: {
+        latitude: 0,
+        longitude: 0,
+    },
+    photo: null,
+};
+
 const Home: React.FC = () => {
-    const [personA, setPersonA] = useState("");
-    const [personB, setPersonB] = useState("");
+    const [personA, setPersonA] = useState<FormDataType>(defaultFormData);
+    const [personB, setPersonB] = useState<FormDataType>(defaultFormData);
     const history = useHistory();
 
     const handleSubmit = () => {
-        console.log(personA, personB)
-
         history.push("/results", {
-            personAZip: personA,
-            personBZip: personB,
+            personA,
+            personB,
         });
     };
 
     const handlePersonChange = (formData: FormDataType, isPersonA: boolean) => {
-        const personData = formData;
         if (isPersonA) {
-            setPersonA(personData.zipCode);
+            setPersonA(formData);
         } else {
-            setPersonB(personData.zipCode);
+            setPersonB(formData);
         }
     };
 
@@ -51,7 +62,9 @@ const Home: React.FC = () => {
                             handlePersonChange(formData, true)
                         }
                     />
-                    {!!personA && !!personB && <PulsingCircle navToResults={handleSubmit} />}
+                    {!!personA && !!personB && (
+                        <PulsingCircle navToResults={handleSubmit} />
+                    )}
                     <PersonCard
                         isPersonA={false}
                         setPerson={(formData) =>
