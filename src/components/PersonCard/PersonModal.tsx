@@ -15,6 +15,7 @@ import {
     IonRow,
     IonTitle,
     IonToolbar,
+    useIonToast,
 } from "@ionic/react";
 import { locateOutline } from "ionicons/icons";
 import React, { useState, useEffect } from "react";
@@ -46,6 +47,15 @@ export interface PersonModalProps {
 
 const GOOGLE_API_KEY = environment.REACT_APP_GOOGLE_API_KEY;
 
+const getAddressComponent = (data: any, type: string) => {
+    const addressComponents = data.results[0].address_components;
+    return (
+        addressComponents.find((component: { types: string }) =>
+            component.types.includes(type)
+        )?.short_name || ""
+    );
+};
+
 const PersonModal: React.FC<PersonModalProps> = ({
     isModalOpen,
     toggleModal,
@@ -55,9 +65,10 @@ const PersonModal: React.FC<PersonModalProps> = ({
     formData,
 }) => {
     const [contact, setContact] = useState<ContactPayload | null>(null);
-    const [photo, setPhoto] = useState<string | null>(formData?.photo ?? null);
+    const [present] = useIonToast();
 
     // Form fields
+    const [photo, setPhoto] = useState<string | null>(formData?.photo ?? null);
     const [name, setName] = useState(formData?.name ?? "");
     const [address, setAddress] = useState(formData?.address ?? "");
     const [city, setCity] = useState(formData?.city ?? "");
@@ -114,6 +125,20 @@ const PersonModal: React.FC<PersonModalProps> = ({
         setPhoto(imageUrl ?? null);
     };
 
+    const presentToast = (
+        position: "top" | "middle" | "bottom",
+        message: string,
+        color: string,
+        duration?: number
+    ) => {
+        present({
+            message: message,
+            duration: duration ?? 500,
+            color: color,
+            position: position,
+        });
+    };
+
     const getCurrentLocation = async () => {
         try {
             const coordinates = await Geolocation.getCurrentPosition();
@@ -128,30 +153,110 @@ const PersonModal: React.FC<PersonModalProps> = ({
             const response = await CapacitorHttp.get(options);
             const data = response.data;
 
-            const addressComponents = data.results[0].address_components;
-            const getAddressComponent = (type: string) => {
-                return (
-                    addressComponents.find((component: { types: string }) =>
-                        component.types.includes(type)
-                    )?.short_name || ""
-                );
-            };
-
             const address = `${getAddressComponent(
+                data,
                 "street_number"
-            )} ${getAddressComponent("route")}`;
-            const city = getAddressComponent("locality");
-            const state = getAddressComponent("administrative_area_level_1");
-            const zipCode = getAddressComponent("postal_code");
-            const country = getAddressComponent("country");
+            )} ${getAddressComponent(data, "route")}`;
+            const city = getAddressComponent(data, "locality");
+            const state = getAddressComponent(
+                data,
+                "administrative_area_level_1"
+            );
+            const zipCode = getAddressComponent(data, "postal_code");
+            const country = getAddressComponent(data, "country");
 
             setAddress(address);
             setCity(city);
             setState(state);
             setZipCode(zipCode);
             setCountry(country);
+
+            presentToast("bottom", "Location found", "dark");
         } catch (error) {
             console.error("Error getting location:", error);
+            presentToast("bottom", "Error getting location", "danger");
+        }
+    };
+
+    const handleAddressAutoComplete = async (address: string) => {
+        setAddress(address);
+
+        if (zipCode.length < 5) return;
+
+        try {
+            const url = `https://maps.googleapis.com/maps/api/geocode/json?address=${address},${zipCode}&key=${GOOGLE_API_KEY}`;
+            const options = {
+                url,
+            };
+            const response = await CapacitorHttp.get(options);
+            const data = response.data;
+            if (data.results[0].partial_match) throw new Error();
+
+            const newAddress = `${getAddressComponent(
+                data,
+                "street_number"
+            )} ${getAddressComponent(data, "route")}`;
+            const city = getAddressComponent(data, "locality");
+            const state = getAddressComponent(
+                data,
+                "administrative_area_level_1"
+            );
+            const country = getAddressComponent(data, "country");
+
+            setAddress(newAddress);
+            setCity(city);
+            setState(state);
+            setCountry(country);
+            presentToast("bottom", "Address found", "dark");
+        } catch (error) {
+            console.error("Error getting location:", error);
+            presentToast(
+                "bottom",
+                "Location not found, check address/zip code",
+                "danger",
+                2000
+            );
+        }
+    };
+
+    const handleZipCodeAutoComplete = async (zipCode: string) => {
+        setZipCode(zipCode);
+
+        if (zipCode.length < 5 || address.length === 0) return;
+
+        try {
+            const url = `https://maps.googleapis.com/maps/api/geocode/json?address=${address},${zipCode}&key=${GOOGLE_API_KEY}`;
+            const options = {
+                url,
+            };
+            const response = await CapacitorHttp.get(options);
+            const data = response.data;
+            if (data.results[0].partial_match) throw new Error();
+
+            const newAddress = `${getAddressComponent(
+                data,
+                "street_number"
+            )} ${getAddressComponent(data, "route")}`;
+            const city = getAddressComponent(data, "locality");
+            const state = getAddressComponent(
+                data,
+                "administrative_area_level_1"
+            );
+            const country = getAddressComponent(data, "country");
+
+            setAddress(newAddress);
+            setCity(city);
+            setState(state);
+            setCountry(country);
+            presentToast("bottom", "Address found", "dark");
+        } catch (error) {
+            console.error("Error getting location:", error);
+            presentToast(
+                "bottom",
+                "Location not found, check address/zip code",
+                "danger",
+                2000
+            );
         }
     };
 
@@ -234,12 +339,27 @@ const PersonModal: React.FC<PersonModalProps> = ({
                         label="Address"
                         value={address}
                         placeholder="required"
-                        onIonInput={(e) => setAddress(e.target.value as string)}
+                        onIonBlur={(e) =>
+                            handleAddressAutoComplete(e.target.value as string)
+                        }
                     />
                     <IonIcon
                         icon={locateOutline}
                         slot="end"
                         onClick={getCurrentLocation}
+                    />
+                </IonItem>
+                <IonItem>
+                    <IonInput
+                        type="text"
+                        labelPlacement="floating"
+                        label="Zip Code"
+                        value={zipCode}
+                        placeholder="required"
+                        onIonInput={(e) =>
+                            handleZipCodeAutoComplete(e.target.value as string)
+                        }
+                        maxlength={5}
                     />
                 </IonItem>
                 <IonGrid className="ion-no-padding">
@@ -251,10 +371,7 @@ const PersonModal: React.FC<PersonModalProps> = ({
                                     labelPlacement="floating"
                                     label="City"
                                     value={city}
-                                    placeholder="required"
-                                    onIonInput={(e) =>
-                                        setCity(e.target.value as string)
-                                    }
+                                    disabled={true}
                                 />
                             </IonItem>
                         </IonCol>
@@ -265,10 +382,7 @@ const PersonModal: React.FC<PersonModalProps> = ({
                                     labelPlacement="floating"
                                     label="State"
                                     value={state}
-                                    placeholder="required"
-                                    onIonInput={(e) =>
-                                        setState(e.target.value as string)
-                                    }
+                                    disabled={true}
                                 />
                             </IonItem>
                         </IonCol>
@@ -278,20 +392,9 @@ const PersonModal: React.FC<PersonModalProps> = ({
                     <IonInput
                         type="text"
                         labelPlacement="floating"
-                        label="Zip Code"
-                        value={zipCode}
-                        placeholder="required"
-                        onIonInput={(e) => setZipCode(e.target.value as string)}
-                    />
-                </IonItem>
-                <IonItem>
-                    <IonInput
-                        type="text"
-                        labelPlacement="floating"
                         label="Country"
                         value={country}
-                        placeholder="required"
-                        onIonInput={(e) => setCountry(e.target.value as string)}
+                        disabled={true}
                     />
                 </IonItem>
             </IonContent>
