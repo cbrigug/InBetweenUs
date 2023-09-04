@@ -43,7 +43,7 @@ const AddPersonCard: React.FC<AddPersonCardProps> = ({ isPersonA, modal }) => {
                 color={"tertiary"}
                 button={true}
                 onClick={modal.toggleModal}
-                style={{ marginTop: isPersonA ? "0px" : "15px" }}
+                style={{ marginTop: isPersonA ? "0px" : "var(--ion-margin, 16px)" }}
             >
                 <IonRippleEffect />
                 <IonGrid className={classes.grid}>

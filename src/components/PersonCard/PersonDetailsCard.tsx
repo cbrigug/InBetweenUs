@@ -2,18 +2,15 @@ import React from "react";
 import PersonModal, { FormDataType, PersonModalProps } from "./PersonModal";
 import { createUseStyles } from "react-jss";
 import {
-    IonAvatar,
     IonCard,
     IonCardContent,
-    IonCardHeader,
-    IonCardTitle,
     IonCol,
     IonGrid,
-    IonLabel,
     IonRippleEffect,
     IonRow,
     IonText,
 } from "@ionic/react";
+import Avatar from "../Avatar";
 
 interface PersonDetailsCardProps {
     formData: FormDataType;
@@ -25,17 +22,17 @@ const useStyles = createUseStyles({
     card: {
         height: "49%",
         borderRadius: "50px",
+        boxShadow: "none",
     },
-    label: {
+    name: {
         fontSize: "36px",
-        fontWeight: "bold",
         overflow: "hidden",
         WebkitBoxOrient: "vertical",
         WebkitLineClamp: 2,
         display: "-webkit-box",
     },
     text: {
-        fontSize: "25px",
+        fontWeight: "normal",
         overflow: "hidden",
         WebkitBoxOrient: "vertical",
         WebkitLineClamp: 3,
@@ -54,50 +51,42 @@ const PersonDetailsCard: React.FC<PersonDetailsCardProps> = ({
         <>
             <IonCard
                 className={`ion-no-margin ${classes.card}`}
-                color={isPersonA ? "lightblue" : "primary"}
+                color={"tertiary"}
                 button={true}
                 onClick={modal.toggleModal}
-                style={{ marginTop: isPersonA ? "0px" : "15px" }}
+                style={{
+                    marginTop: isPersonA ? "0px" : "var(--ion-margin, 16px)",
+                }}
             >
                 <IonRippleEffect />
-                <IonCardHeader color={isPersonA ? "primary" : "lightblue"}>
-                    <IonCardTitle>
-                        <IonGrid style={{ height: "90px" }}>
-                            <IonRow style={{ height: "100%" }}>
-                                <IonCol
-                                    size="8"
-                                    className="ion-align-self-center"
-                                >
-                                    <IonLabel className={classes.label}>
-                                        {formData.name}
-                                    </IonLabel>
-                                </IonCol>
-                                <IonCol size="4">
-                                    <IonAvatar
-                                        style={{
-                                            height: "75px",
-                                            width: "75px",
-                                            boxShadow:
-                                                "0px 5px 10px 0px rgba(0, 0, 0, 0.5)",
-                                        }}
-                                    >
-                                        <img
-                                            src={`${
-                                                formData.photo ??
-                                                "https://ionicframework.com/docs/img/demos/avatar.svg"
-                                            }`}
-                                        />
-                                    </IonAvatar>
-                                </IonCol>
-                            </IonRow>
-                        </IonGrid>
-                    </IonCardTitle>
-                </IonCardHeader>
                 <IonCardContent>
-                    <IonGrid className="ion-padding-top">
-                        <IonRow>
-                            <IonText className={classes.text}>
-                                {`${formData.address}, ${formData.city}, ${formData.state} ${formData.zipCode}`}
+                    <IonGrid className="ion-no-padding">
+                        <IonRow className="ion-text-center ion-justify-content-center">
+                            <Avatar
+                                name={formData.name}
+                                size={"96px"}
+                                image={formData.photo ?? undefined}
+                            />
+                        </IonRow>
+                        <IonRow className="ion-text-center">
+                            <IonCol>
+                                <IonText className={classes.name}>
+                                    {formData.name.split(" ")[0]}
+                                </IonText>
+                            </IonCol>
+                        </IonRow>
+                        <IonRow className="ion-justify-content-center">
+                            <IonText
+                                className={`${classes.text}`}
+                                color={"secondary"}
+                            >
+                                {`${formData.address}`}
+                            </IonText>
+                            <IonText
+                                className={`${classes.text}`}
+                                color={"secondary"}
+                            >
+                                {`${formData.city}, ${formData.state} ${formData.zipCode}`}
                             </IonText>
                         </IonRow>
                     </IonGrid>
