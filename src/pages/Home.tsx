@@ -2,9 +2,11 @@ import {
     IonContent,
     IonHeader,
     IonPage,
-    IonTitle,
     IonToolbar,
     IonGrid,
+    IonButtons,
+    IonIcon,
+    IonText,
 } from "@ionic/react";
 import { useState } from "react";
 import { useHistory } from "react-router-dom";
@@ -12,6 +14,7 @@ import React from "react";
 import PersonCard from "../components/PersonCard/PersonCard";
 import { FormDataType } from "../components/PersonCard/PersonModal";
 import PulsingCircle from "../components/PulsingCircle";
+import { personCircle } from "ionicons/icons";
 
 const defaultFormData: FormDataType = {
     name: "",
@@ -49,9 +52,13 @@ const Home: React.FC = () => {
 
     return (
         <IonPage>
-            <IonHeader>
+            <IonHeader className="ion-no-border">
                 <IonToolbar>
-                    <IonTitle>In Between Us</IonTitle>
+                    <IonText>InBetween</IonText>
+                    <IonText color={"primary"}>Us</IonText>
+                    <IonButtons slot="end">
+                        <IonIcon icon={personCircle} />
+                    </IonButtons>
                 </IonToolbar>
             </IonHeader>
             <IonContent className="ion-padding">

@@ -3,30 +3,30 @@ http://ionicframework.com/docs/theming/ */
 
 @font-face {
     font-family: AppFont;
-    src: url("../assets/fonts/Montserrat-Regular.ttf");
+    src: url("../assets/fonts/Raleway-Regular.ttf");
 }
 
 :root {
-    --ion-color-primary: #1687f7;
-    --ion-color-primary-rgb: 22, 135, 247;
-    --ion-color-primary-contrast: #ffffff;
-    --ion-color-primary-contrast-rgb: 255, 255, 255;
-    --ion-color-primary-shade: #1377d9;
-    --ion-color-primary-tint: #2d93f8;
+    --ion-color-primary: #6eafec;
+    --ion-color-primary-rgb: 110, 175, 236;
+    --ion-color-primary-contrast: #000000;
+    --ion-color-primary-contrast-rgb: 0, 0, 0;
+    --ion-color-primary-shade: #619ad0;
+    --ion-color-primary-tint: #7db7ee;
 
-    --ion-color-secondary: #2469ad;
-    --ion-color-secondary-rgb: 36, 105, 173;
-    --ion-color-secondary-contrast: #ffffff;
-    --ion-color-secondary-contrast-rgb: 255, 255, 255;
-    --ion-color-secondary-shade: #205c98;
-    --ion-color-secondary-tint: #3a78b5;
+    --ion-color-secondary: #8f8f8f;
+    --ion-color-secondary-rgb: 143, 143, 143;
+    --ion-color-secondary-contrast: #000000;
+    --ion-color-secondary-contrast-rgb: 0, 0, 0;
+    --ion-color-secondary-shade: #7e7e7e;
+    --ion-color-secondary-tint: #9a9a9a;
 
-    --ion-color-tertiary: #3f7dba;
-    --ion-color-tertiary-rgb: 63, 125, 186;
-    --ion-color-tertiary-contrast: #ffffff;
-    --ion-color-tertiary-contrast-rgb: 255, 255, 255;
-    --ion-color-tertiary-shade: #376ea4;
-    --ion-color-tertiary-tint: #528ac1;
+    --ion-color-tertiary: #f7f8fa;
+    --ion-color-tertiary-rgb: 247, 248, 250;
+    --ion-color-tertiary-contrast: #000000;
+    --ion-color-tertiary-contrast-rgb: 0, 0, 0;
+    --ion-color-tertiary-shade: #d9dadc;
+    --ion-color-tertiary-tint: #f8f9fb;
 
     --ion-color-success: #2dd36f;
     --ion-color-success-rgb: 45, 211, 111;
@@ -63,13 +63,6 @@ http://ionicframework.com/docs/theming/ */
     --ion-color-light-shade: #d7d8da;
     --ion-color-light-tint: #f5f6f9;
 
-    --ion-color-dull: #a7c0d9;
-    --ion-color-dull-rgb: 167, 192, 217;
-    --ion-color-dull-contrast: #000000;
-    --ion-color-dull-contrast-rgb: 0, 0, 0;
-    --ion-color-dull-shade: #93a9bf;
-    --ion-color-dull-tint: #b0c6dd;
-
     --ion-color-lightblue: #9dccfc;
     --ion-color-lightblue-rgb: 157, 204, 252;
     --ion-color-lightblue-contrast: #000000;
@@ -78,6 +71,29 @@ http://ionicframework.com/docs/theming/ */
     --ion-color-lightblue-tint: #a7d1fc;
 
     --ion-font-family: "AppFont";
+}
+
+/* Global styles */
+
+ion-header {
+    padding: calc(var(--ion-padding, 16px) * 0.75);
+    padding-bottom: 0;
+}
+
+ion-toolbar {
+    --background: white;
+
+    && ion-text {
+        font-size: 24px;
+    }
+
+    && ion-buttons ion-icon {
+        font-size: 40px !important;
+    }
+}
+
+ion-text {
+    font-weight: bold;
 }
 
 .ion-color-lightblue {
