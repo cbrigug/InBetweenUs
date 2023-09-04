@@ -31,7 +31,7 @@ const PulsingCircle: React.FC<PulsingCircleProps> = ({ navToResults }) => {
     return (
         <IonIcon
             icon={arrowForwardCircle}
-            color="dark"
+            color="primary"
             className={classes.icon}
             onClick={navToResults}
         ></IonIcon>

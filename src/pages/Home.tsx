@@ -69,7 +69,7 @@ const Home: React.FC = () => {
                             handlePersonChange(formData, true)
                         }
                     />
-                    {!!personA && !!personB && (
+                    {!!personA.name && !!personB.name && (
                         <PulsingCircle navToResults={handleSubmit} />
                     )}
                     <PersonCard
