@@ -3,10 +3,21 @@ interface ShortCoords {
     lng: number;
 }
 
+interface Address {
+    city: string;
+    countryCode: string;
+    countryName: string;
+    county: string;
+    label: string;
+    postalCode: string;
+    state: string;
+    stateCode: string;
+}
+
 export interface City {
     title: string;
     position: ShortCoords;
-    address: string;
+    address: Address;
     drivingTimeA: number;
     drivingTimeB: number;
 }

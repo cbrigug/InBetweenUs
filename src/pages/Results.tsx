@@ -21,13 +21,12 @@ import { useLocation } from "react-router";
 import { useEffect, useState } from "react";
 import {
     chevronExpandOutline,
-    helpCircleOutline,
+    home,
+    newspaper,
     refreshOutline,
 } from "ionicons/icons";
-import GoogleMapsLink from "../components/GoogleMapsLink";
 import { convertSecondsToHoursMinutes } from "../utils/timeUtils";
 import { environment } from "../../environment.dev";
-import Map from "../components/Map";
 import React from "react";
 import NoResultsFound from "../components/NoResultsFound";
 import { findMidpoint } from "../utils/midpointUtils";
@@ -214,7 +213,7 @@ const Results: React.FC = () => {
                                 const middle = `${location.position.lat},${location.position.lng}`;
                                 return {
                                     ...location,
-                                    address: location.title,
+                                    address: location.address,
                                     drivingTimeA: (
                                         await getDriveData(personAStart, middle)
                                     ).time,
@@ -269,15 +268,21 @@ const Results: React.FC = () => {
 
     return (
         <IonPage>
-            <IonHeader>
+            <IonHeader className="ion-no-border">
                 <IonToolbar>
-                    <IonTitle>Results</IonTitle>
+                    <IonButtons slot="start">
+                        <IonIcon icon={home} size="large" />
+                    </IonButtons>
+                    <div className="ion-text-center">
+                        <IonText>
+                            {middleCityList[index]?.address.city},{" "}
+                        </IonText>
+                        <IonText color={"primary"}>
+                            {middleCityList[index]?.address.stateCode}
+                        </IonText>
+                    </div>
                     <IonButtons slot="end">
-                        <IonIcon
-                            icon={helpCircleOutline}
-                            size="large"
-                            onClick={() => setShowHelpText(!showHelpText)}
-                        />
+                        <IonIcon icon={newspaper} size="large" />
                     </IonButtons>
                 </IonToolbar>
             </IonHeader>
@@ -286,15 +291,6 @@ const Results: React.FC = () => {
                     {middleCityList[index] ? (
                         <>
                             <IonGrid>
-                                <IonRow>
-                                    <IonCol>
-                                        <GoogleMapsLink
-                                            formattedAddress={
-                                                middleCityList[index].address
-                                            }
-                                        />
-                                    </IonCol>
-                                </IonRow>
                                 <IonRow>
                                     <IonCol>
                                         <IonText color="medium">
@@ -372,7 +368,7 @@ const Results: React.FC = () => {
                                 </IonRow>
                                 <IonRow>
                                     <IonCol>
-                                        <Map
+                                        {/* <Map
                                             center={{
                                                 latitude:
                                                     middleCityList[index]
@@ -383,7 +379,7 @@ const Results: React.FC = () => {
                                             }}
                                             personA={personACoords}
                                             personB={personBCoords}
-                                        />
+                                        /> */}
                                     </IonCol>
                                 </IonRow>
                             </IonGrid>
