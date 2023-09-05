@@ -11,9 +11,9 @@ import {
 import { useState } from "react";
 import { useHistory } from "react-router-dom";
 import React from "react";
-import PersonCard from "../components/PersonCard/PersonCard";
-import { FormDataType } from "../components/PersonCard/PersonModal";
-import PulsingCircle from "../components/PulsingCircle";
+import PersonCard from "../components/Home/PersonCard/PersonCard";
+import { FormDataType } from "../components/Home/PersonCard/PersonModal";
+import PulsingCircle from "../components/Home/PulsingCircle";
 import { personCircle } from "ionicons/icons";
 
 const defaultFormData: FormDataType = {

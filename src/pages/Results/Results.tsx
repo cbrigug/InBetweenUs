@@ -1,5 +1,4 @@
 import {
-    IonButton,
     IonButtons,
     IonCol,
     IonContent,
@@ -8,32 +7,27 @@ import {
     IonIcon,
     IonLoading,
     IonPage,
-    IonRange,
     IonRow,
-    IonSpinner,
     IonText,
-    IonTitle,
     IonToolbar,
     useIonToast,
 } from "@ionic/react";
 import "./Results.css";
 import { useLocation } from "react-router";
 import { useEffect, useState } from "react";
-import {
-    chevronExpandOutline,
-    home,
-    newspaper,
-    refreshOutline,
-} from "ionicons/icons";
-import { convertSecondsToHoursMinutes } from "../utils/timeUtils";
-import { environment } from "../../environment.dev";
+import { home, newspaper } from "ionicons/icons";
+import { environment } from "../../../environment.dev";
 import React from "react";
-import NoResultsFound from "../components/NoResultsFound";
-import { findMidpoint } from "../utils/midpointUtils";
-import { Coordinates, addDistanceToCenterCoords } from "../utils/distanceUtils";
-import { City, CityResponse } from "../interfaces/City";
+import NoResultsFound from "./NoResultsFound";
+import { findMidpoint } from "../../utils/midpointUtils";
+import {
+    Coordinates,
+    addDistanceToCenterCoords,
+} from "../../utils/distanceUtils";
+import { City, CityResponse } from "../../interfaces/City";
 import { CapacitorHttp } from "@capacitor/core";
-import { FormDataType } from "../components/PersonCard/PersonModal";
+import { FormDataType } from "../../components/Home/PersonCard/PersonModal";
+import DrivingTimeBanner from "../../components/Results/DrivingTimeBanner";
 
 interface ResultsProps {
     personA: FormDataType;
@@ -268,8 +262,12 @@ const Results: React.FC = () => {
 
     return (
         <IonPage>
-            <IonHeader className="ion-no-border">
-                <IonToolbar>
+            <IonHeader>
+                <IonToolbar
+                    style={{
+                        paddingBottom: "calc(var(--ion-padding, 16px) * 0.5)",
+                    }}
+                >
                     <IonButtons slot="start">
                         <IonIcon icon={home} size="large" />
                     </IonButtons>
@@ -289,101 +287,7 @@ const Results: React.FC = () => {
             <IonContent className="ion-padding">
                 <div className="results-container">
                     {middleCityList[index] ? (
-                        <>
-                            <IonGrid>
-                                <IonRow>
-                                    <IonCol>
-                                        <IonText color="medium">
-                                            Person A:{" "}
-                                            {convertSecondsToHoursMinutes(
-                                                middleCityList[index]
-                                                    .drivingTimeA
-                                            )}
-                                        </IonText>
-                                    </IonCol>
-                                    <IonCol>
-                                        <IonText color="medium">
-                                            Person B:{" "}
-                                            {convertSecondsToHoursMinutes(
-                                                middleCityList[index]
-                                                    .drivingTimeB
-                                            )}
-                                        </IonText>
-                                    </IonCol>
-                                </IonRow>
-                                <IonRow>
-                                    <IonCol>
-                                        <IonRange
-                                            onIonChange={(e) => {
-                                                setFlexibility(
-                                                    e.detail.value as number
-                                                );
-                                            }}
-                                            ticks={true}
-                                            snaps={true}
-                                            min={0}
-                                            max={3}
-                                        >
-                                            <IonIcon
-                                                icon={chevronExpandOutline}
-                                                slot="end"
-                                            />
-                                        </IonRange>
-                                    </IonCol>
-                                </IonRow>
-                                {showHelpText && (
-                                    <IonRow>
-                                        <IonCol>
-                                            <IonText
-                                                color="medium"
-                                                id="help-text"
-                                            >
-                                                Adjust slider to increase the
-                                                bounds of places to meet (this
-                                                typically results in longer
-                                                driving times).
-                                            </IonText>
-                                        </IonCol>
-                                    </IonRow>
-                                )}
-                                <IonRow>
-                                    <IonCol>
-                                        <IonButton
-                                            disabled={isLoading}
-                                            expand="block"
-                                            onClick={() => findAnother(index)}
-                                        >
-                                            Find Another ({index + 1} /{" "}
-                                            {middleCityList.length})
-                                            {isLoading ? (
-                                                <IonSpinner name="lines-sharp-small" />
-                                            ) : (
-                                                <IonIcon
-                                                    icon={refreshOutline}
-                                                    slot="end"
-                                                />
-                                            )}
-                                        </IonButton>
-                                    </IonCol>
-                                </IonRow>
-                                <IonRow>
-                                    <IonCol>
-                                        {/* <Map
-                                            center={{
-                                                latitude:
-                                                    middleCityList[index]
-                                                        .position.lat,
-                                                longitude:
-                                                    middleCityList[index]
-                                                        .position.lng,
-                                            }}
-                                            personA={personACoords}
-                                            personB={personBCoords}
-                                        /> */}
-                                    </IonCol>
-                                </IonRow>
-                            </IonGrid>
-                        </>
+                        <DrivingTimeBanner />
                     ) : (
                         <NoResultsFound />
                     )}

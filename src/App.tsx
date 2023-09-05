@@ -32,7 +32,7 @@ import "@ionic/react/css/display.css";
 import "./theme/variables.css";
 
 import { compassOutline, listOutline } from "ionicons/icons";
-import Results from "./pages/Results";
+import Results from "./pages/Results/Results";
 
 setupIonicReact();
 

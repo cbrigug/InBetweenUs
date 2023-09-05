@@ -10,7 +10,7 @@ import {
     IonRow,
     IonText,
 } from "@ionic/react";
-import Avatar from "../Avatar";
+import Avatar from "../../Avatar";
 
 interface PersonDetailsCardProps {
     formData: FormDataType;

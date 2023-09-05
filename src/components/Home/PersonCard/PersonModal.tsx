@@ -22,10 +22,10 @@ import React, { useState, useEffect } from "react";
 import ImportContact from "../ImportContact";
 import { ContactPayload } from "@capacitor-community/contacts";
 import { Camera, CameraResultType, CameraSource } from "@capacitor/camera";
-import { environment } from "../../../environment.dev";
+import { environment } from "../../../../environment.dev";
 import { Geolocation } from "@capacitor/geolocation";
 import { CapacitorHttp } from "@capacitor/core";
-import { Coordinates } from "../../utils/distanceUtils";
+import { Coordinates } from "../../../utils/distanceUtils";
 
 export type FormDataType = {
     name: string;
