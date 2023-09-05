@@ -15,7 +15,7 @@ const Avatar: React.FC<AvatarProps> = ({ name, size, image }) => {
         height: size,
         lineHeight: size,
         borderRadius: "50%",
-        fontSize: "36px",
+        fontSize: "32px",
         color: "white",
         backgroundColor: "var(--ion-color-primary)",
         backgroundImage: image,

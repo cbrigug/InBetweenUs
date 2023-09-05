@@ -262,12 +262,8 @@ const Results: React.FC = () => {
 
     return (
         <IonPage>
-            <IonHeader>
-                <IonToolbar
-                    style={{
-                        paddingBottom: "calc(var(--ion-padding, 16px) * 0.5)",
-                    }}
-                >
+            <IonHeader className="ion-no-border">
+                <IonToolbar>
                     <IonButtons slot="start">
                         <IonIcon icon={home} size="large" />
                     </IonButtons>
@@ -287,7 +283,18 @@ const Results: React.FC = () => {
             <IonContent className="ion-padding">
                 <div className="results-container">
                     {middleCityList[index] ? (
-                        <DrivingTimeBanner />
+                        <>
+                            <DrivingTimeBanner
+                                personA={personA}
+                                personB={personB}
+                                drivingTimeA={
+                                    middleCityList[index].drivingTimeA
+                                }
+                                drivingTimeB={
+                                    middleCityList[index].drivingTimeB
+                                }
+                            />
+                        </>
                     ) : (
                         <NoResultsFound />
                     )}
