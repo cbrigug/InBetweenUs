@@ -9,6 +9,7 @@ import {
 import { image } from "ionicons/icons";
 import React, { useState } from "react";
 import { createUseStyles } from "react-jss";
+import ActivityTypeIcon from "./ActivityTypeIcon";
 
 interface ThingToDoCardProps {
     thingToDo: any;
@@ -31,7 +32,7 @@ const useStyles = createUseStyles({
     text: {
         fontWeight: "normal",
         backdropFilter: "brightness(0.5)",
-        fontSize: "1rem",
+        fontSize: ".9rem",
         position: "absolute",
         bottom: "0px",
         marginBottom: "calc(var(--ion-margin, 16px) * 0.5)",
@@ -80,6 +81,7 @@ const ThingToDoCard: React.FC<ThingToDoCardProps> = ({ thingToDo }) => {
                     </IonText>
                 </>
             )}
+            <ActivityTypeIcon types={thingToDo.kinds} />
         </IonCard>
     );
 };

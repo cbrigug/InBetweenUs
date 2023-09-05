@@ -1,0 +1,118 @@
+import { IonIcon } from "@ionic/react";
+import React from "react";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import {
+    faBridge,
+    faLandmark,
+    faTree,
+    faIndustry,
+    faPlaceOfWorship,
+    faPiggyBank,
+} from "@fortawesome/free-solid-svg-icons";
+import {
+    bed,
+    wine,
+    balloon,
+    globe,
+    football,
+    fastFood,
+    cart,
+    bus,
+} from "ionicons/icons";
+import { createUseStyles } from "react-jss";
+
+type IonIconType =
+    | "accomodations"
+    | "adult"
+    | "amusements"
+    | "culture"
+    | "sport"
+    | "foods"
+    | "shops"
+    | "transport";
+
+type FontAwesomeIconType =
+    | "architecture"
+    | "historic"
+    | "natural"
+    | "industrial_facilities"
+    | "religion"
+    | "banks";
+
+interface ActivityTypeIconProps {
+    types: string;
+}
+
+const ionIconMap = {
+    accomodations: bed,
+    adult: wine,
+    amusements: balloon,
+    culture: globe,
+    sport: football,
+    foods: fastFood,
+    shops: cart,
+    transport: bus,
+};
+
+const faIconMap = {
+    architecture: faBridge,
+    historic: faLandmark,
+    natural: faTree,
+    industrial_facilities: faIndustry,
+    religion: faPlaceOfWorship,
+    banks: faPiggyBank,
+};
+
+const useStyles = createUseStyles({
+    iconContainer: {
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "center",
+        width: "32px",
+        height: "32px",
+        backdropFilter: "brightness(0.25)",
+        borderRadius: "50%",
+        marginLeft: "calc(var(--ion-margin, 16px) * 0.25)",
+        marginTop: "calc(var(--ion-margin, 16px) * 0.25)",
+    },
+});
+
+const ActivityTypeIcon: React.FC<ActivityTypeIconProps> = ({ types }) => {
+    const classes = useStyles();
+
+    // look for type in IonIconType and FontAwesomeIconType
+    const getSingleType = (types: string) => {
+        const allTypes = types.split(",");
+        for (const type of allTypes) {
+            if (type in ionIconMap || type in faIconMap) {
+                return type;
+            }
+        }
+
+        return "";
+    };
+
+    const type = getSingleType(types);
+
+    if (type in ionIconMap) {
+        return (
+            <div className={classes.iconContainer}>
+                <IonIcon icon={ionIconMap[type as IonIconType]} color="light" />
+            </div>
+        );
+    }
+    if (type in faIconMap) {
+        return (
+            <div className={classes.iconContainer}>
+                <FontAwesomeIcon
+                    icon={faIconMap[type as FontAwesomeIconType]}
+                    color="var(--ion-color-light)"
+                />
+            </div>
+        );
+    }
+
+    return null;
+};
+
+export default ActivityTypeIcon;
