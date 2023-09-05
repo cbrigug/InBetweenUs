@@ -1,13 +1,10 @@
 import {
     IonButtons,
-    IonCol,
     IonContent,
-    IonGrid,
     IonHeader,
     IonIcon,
     IonLoading,
     IonPage,
-    IonRow,
     IonText,
     IonToolbar,
     useIonToast,
@@ -28,6 +25,7 @@ import { City, CityResponse } from "../../interfaces/City";
 import { CapacitorHttp } from "@capacitor/core";
 import { FormDataType } from "../../components/Home/PersonCard/PersonModal";
 import DrivingTimeBanner from "../../components/Results/DrivingTimeBanner";
+import ThingsToDoSection from "../../components/Results/ThingsToDo/ThingsToDoSection";
 
 interface ResultsProps {
     personA: FormDataType;
@@ -269,7 +267,7 @@ const Results: React.FC = () => {
                     </IonButtons>
                     <div className="ion-text-center">
                         <IonText>
-                            {middleCityList[index]?.address.city},{" "}
+                            {middleCityList[index]?.address.city},&nbsp;
                         </IonText>
                         <IonText color={"primary"}>
                             {middleCityList[index]?.address.stateCode}
@@ -280,25 +278,21 @@ const Results: React.FC = () => {
                     </IonButtons>
                 </IonToolbar>
             </IonHeader>
-            <IonContent className="ion-padding">
-                <div className="results-container">
-                    {middleCityList[index] ? (
-                        <>
-                            <DrivingTimeBanner
-                                personA={personA}
-                                personB={personB}
-                                drivingTimeA={
-                                    middleCityList[index].drivingTimeA
-                                }
-                                drivingTimeB={
-                                    middleCityList[index].drivingTimeB
-                                }
-                            />
-                        </>
-                    ) : (
-                        <NoResultsFound />
-                    )}
-                </div>
+            <IonContent className="ion-padding-horizontal">
+                {middleCityList[index] ? (
+                    <>
+                        <DrivingTimeBanner
+                            personA={personA}
+                            personB={personB}
+                            drivingTimeA={middleCityList[index].drivingTimeA}
+                            drivingTimeB={middleCityList[index].drivingTimeB}
+                        />
+
+                        <ThingsToDoSection coords={middleCityList[index].position} />
+                    </>
+                ) : (
+                    <NoResultsFound />
+                )}
                 <IonLoading isOpen={isLoading} />
             </IonContent>
         </IonPage>

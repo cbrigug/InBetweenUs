@@ -1,4 +1,4 @@
-interface ShortCoords {
+export interface ShortCoords {
     lat: number;
     lng: number;
 }
