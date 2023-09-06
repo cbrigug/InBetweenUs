@@ -80,7 +80,7 @@ const PersonDetailsCard: React.FC<PersonDetailsCardProps> = ({
                                 className={`${classes.text}`}
                                 color={"secondary"}
                             >
-                                {`${formData.address}`}
+                                {`${formData.address}`}&nbsp;
                             </IonText>
                             <IonText
                                 className={`${classes.text}`}

@@ -1,9 +1,4 @@
-import {
-    IonCard,
-    IonIcon,
-    IonText,
-    IonCardContent,
-} from "@ionic/react";
+import { IonCard, IonIcon, IonText, IonCardContent } from "@ionic/react";
 import { image } from "ionicons/icons";
 import React, { useState } from "react";
 import { createUseStyles } from "react-jss";
@@ -22,6 +17,8 @@ const useStyles = createUseStyles({
         marginLeft: "calc(var(--ion-margin, 16px) * 0.5)",
         marginRight: "calc(var(--ion-margin, 16px) * 0.5)",
         backgroundSize: "cover",
+        boxShadow: "none",
+        border: "1px solid var(--ion-color-tertiary)",
     },
     image: {
         height: "100%",
@@ -40,6 +37,8 @@ const useStyles = createUseStyles({
         display: "-webkit-box",
         width: "100%",
         textAlign: "center",
+        paddingLeft: "calc(var(--ion-padding, 16px) * 0.125)", // no text against the edge
+        paddingRight: "calc(var(--ion-padding, 16px) * 0.125)",
     },
     backText: {
         fontWeight: "normal",
@@ -53,6 +52,10 @@ const useStyles = createUseStyles({
         right: "0px",
         margin: "auto",
     },
+    backCard: {
+        display: "flex",
+        height: "100%",
+    },
 });
 
 const ThingToDoCard: React.FC<ThingToDoCardProps> = ({ thingToDo }) => {
@@ -62,6 +65,7 @@ const ThingToDoCard: React.FC<ThingToDoCardProps> = ({ thingToDo }) => {
 
     return (
         <ReactCardFlip isFlipped={isFlipped} flipDirection="vertical">
+            {/* Front of Card */}
             <IonCard
                 className={classes.card}
                 color={"tertiary"}
@@ -89,12 +93,15 @@ const ThingToDoCard: React.FC<ThingToDoCardProps> = ({ thingToDo }) => {
                 )}
                 <ActivityTypeIcon types={thingToDo.kinds} />
             </IonCard>
+            {/* Back of Card */}
             <IonCard
                 className={classes.card}
                 color={"tertiary"}
                 onClick={() => setIsFlipped(!isFlipped)}
             >
-                <IonCardContent className="ion-text-center">
+                <IonCardContent
+                    className={`ion-justify-content-center ion-align-items-center ion-text-center ${classes.backCard}`}
+                >
                     <IonText className={classes.backText} color={"dark"}>
                         {thingToDo.wikipedia_extracts
                             ? thingToDo.wikipedia_extracts.title.substring(3) // removes "en:"
