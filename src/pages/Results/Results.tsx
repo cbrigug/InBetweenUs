@@ -137,7 +137,12 @@ async function findLocationsToMeet(
 
 const Results: React.FC = () => {
     const location = useLocation();
-    const { personA, personB } = (location.state as ResultsProps) || {};
+    const [personA, setPersonA] = useState<FormDataType>(
+        (location.state as ResultsProps)?.personA
+    );
+    const [personB, setPersonB] = useState<FormDataType>(
+        (location.state as ResultsProps)?.personB
+    );
 
     const [middleCityList, setMiddleCityList] = useState<City[]>([]);
     const [index, setIndex] = useState(0);
@@ -320,4 +325,4 @@ const Results: React.FC = () => {
     );
 };
 
-export default Results;
+export default React.memo(Results);

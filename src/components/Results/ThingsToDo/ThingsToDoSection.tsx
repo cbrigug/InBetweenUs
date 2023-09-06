@@ -15,6 +15,7 @@ import ThingToDoCard from "./ThingToDoCard";
 import { Swiper, SwiperSlide } from "swiper/react";
 
 import "swiper/css";
+import MoreThingsToDoCard from "./MoreThingsToDoCard";
 
 interface ThingsToDoSectionProps {
     coords: ShortCoords;
@@ -266,7 +267,13 @@ const ThingsToDoSection: React.FC<ThingsToDoSectionProps> = ({ coords }) => {
 
     return (
         <>
-            <IonItem lines="none">
+            <IonItem
+                lines="none"
+                button={true}
+                detail={false}
+                routerLink="/things-to-do"
+                routerDirection="none"
+            >
                 <IonText>Things to&nbsp;</IonText>
                 <IonText color={"primary"}>do</IonText>
                 <IonIcon icon={chevronForward} slot="end" />
@@ -280,6 +287,9 @@ const ThingsToDoSection: React.FC<ThingsToDoSectionProps> = ({ coords }) => {
                                 <ThingToDoCard thingToDo={thingToDo} />
                             </SwiperSlide>
                         ))}
+                        <SwiperSlide>
+                            <MoreThingsToDoCard />
+                        </SwiperSlide>
                     </Swiper>
                 </IonRow>
             </IonGrid>
