@@ -70,7 +70,7 @@ const useStyles = createUseStyles({
         justifyContent: "center",
         width: "32px",
         height: "32px",
-        backdropFilter: "brightness(0.25)",
+        background: "radial-gradient(black, transparent)",
         borderRadius: "50%",
         marginLeft: "calc(var(--ion-margin, 16px) * 0.25)",
         marginTop: "calc(var(--ion-margin, 16px) * 0.25)",

@@ -96,6 +96,11 @@ const mockData = [
         wikipedia:
             "https://en.wikipedia.org/wiki/Middletown%20Historic%20District%20%28Middletown%2C%20Maryland%29",
         image: "https://commons.wikimedia.org/wiki/File:Middletown%2C_Maryland_historic_district.jpg",
+        preview: {
+            source: "https://upload.wikimedia.org/wikipedia/commons/thumb/1/19/Middletown%2C_Maryland_historic_district.jpg/266px-Middletown%2C_Maryland_historic_district.jpg",
+            height: 289,
+            width: 400,
+        },
         wikipedia_extracts: {
             title: "en:Middletown Historic District (Middletown, Maryland)",
             text: "The Middletown Historic District comprises the historic center of Middletown, Maryland. Middletown became the chief community in the Middletown Valley in the late 18th century, retaining its importance until the 1930s, when the expanding influence of Frederick, Maryland, the construction of a bypass on US 40 and the abandonment of the Hagerstown and Frederick Railway produced a gradual decline. The historic district preserves many mid-19th-century buildings in the central downtown area. To the east, the district includes early 20th-century houses built along the trolley right-of-way, forming a streetcar suburb. The Airview Historic District includes a related area of early 20th century development to the east of town along the National Pike, separated from the main district by a section of newer development.",
