@@ -1,4 +1,5 @@
 import {
+    IonButton,
     IonButtons,
     IonContent,
     IonHeader,
@@ -136,7 +137,7 @@ async function findLocationsToMeet(
 
 const Results: React.FC = () => {
     const location = useLocation();
-    const { personA, personB } = (location.state as ResultsProps) || null;
+    const { personA, personB } = (location.state as ResultsProps) || {};
 
     const [middleCityList, setMiddleCityList] = useState<City[]>([]);
     const [index, setIndex] = useState(0);
@@ -168,6 +169,10 @@ const Results: React.FC = () => {
 
     useEffect(() => {
         const fetchCoords = async () => {
+            if (!personA || !personB) {
+                return;
+            }
+
             try {
                 if (personA.coordinates && personB.coordinates) {
                     setIndex(0);
@@ -263,7 +268,14 @@ const Results: React.FC = () => {
             <IonHeader className="ion-no-border">
                 <IonToolbar>
                     <IonButtons slot="start">
-                        <IonIcon icon={home} size="large" />
+                        <IonButton routerLink="/home" routerDirection="root">
+                            <IonIcon
+                                slot="icon-only"
+                                icon={home}
+                                size="large"
+                                color="dark"
+                            />
+                        </IonButton>
                     </IonButtons>
                     <div className="ion-text-center">
                         <IonText>
@@ -274,7 +286,14 @@ const Results: React.FC = () => {
                         </IonText>
                     </div>
                     <IonButtons slot="end">
-                        <IonIcon icon={newspaper} size="large" />
+                        <IonButton>
+                            <IonIcon
+                                slot="icon-only"
+                                icon={newspaper}
+                                size="large"
+                                color="dark"
+                            />
+                        </IonButton>
                     </IonButtons>
                 </IonToolbar>
             </IonHeader>
@@ -288,7 +307,9 @@ const Results: React.FC = () => {
                             drivingTimeB={middleCityList[index].drivingTimeB}
                         />
 
-                        <ThingsToDoSection coords={middleCityList[index].position} />
+                        <ThingsToDoSection
+                            coords={middleCityList[index].position}
+                        />
                     </>
                 ) : (
                     <NoResultsFound />

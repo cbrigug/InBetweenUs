@@ -7,6 +7,7 @@ import {
     IonButtons,
     IonIcon,
     IonText,
+    IonButton,
 } from "@ionic/react";
 import { useState } from "react";
 import { useHistory } from "react-router-dom";
@@ -54,10 +55,22 @@ const Home: React.FC = () => {
         <IonPage>
             <IonHeader className="ion-no-border">
                 <IonToolbar>
-                    <IonText>InBetween</IonText>
+                    <IonText
+                        style={{
+                            paddingLeft: "calc(var(--ion-padding, 16px) * 0.5)",
+                        }}
+                    >
+                        InBetween
+                    </IonText>
                     <IonText color={"primary"}>Us</IonText>
                     <IonButtons slot="end">
-                        <IonIcon icon={personCircle} />
+                        <IonButton>
+                            <IonIcon
+                                slot="icon-only"
+                                icon={personCircle}
+                                color="dark"
+                            />
+                        </IonButton>
                     </IonButtons>
                 </IonToolbar>
             </IonHeader>
