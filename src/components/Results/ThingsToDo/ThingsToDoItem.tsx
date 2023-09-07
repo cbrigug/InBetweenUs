@@ -11,6 +11,7 @@ import { globe, add } from "ionicons/icons";
 import React, { useState } from "react";
 import ActivityTypeIcon, { getSingleType } from "./ActivityTypeIcon";
 import { createUseStyles } from "react-jss";
+import { Haptics, ImpactStyle } from "@capacitor/haptics";
 
 interface ThingsToDoItemProps {
     thingToDo: any;
@@ -35,11 +36,20 @@ const ThingsToDoItem: React.FC<ThingsToDoItemProps> = ({
     const itemRef = React.useRef<HTMLIonItemElement>(null);
     const [slidingRatio, setSlidingRatio] = useState(0);
     const [iconPosition, setIconPosition] = useState(0);
+    const [hasGivenHapticFeedback, setHasGivenHapticFeedback] = useState(false);
 
     // once roughly halfway, move icon to the left
     const handleSlide = async () => {
-        ionItemSlidingRef.current?.getSlidingRatio().then((ratio) => {
+        ionItemSlidingRef.current?.getSlidingRatio().then(async (ratio) => {
             setSlidingRatio(ratio);
+
+            // give haptic feedback once per time passing ratio
+            if (ratio > SLIDE_RATIO && !hasGivenHapticFeedback) {
+                await Haptics.impact({ style: ImpactStyle.Light });
+                setHasGivenHapticFeedback(true);
+            } else if (ratio <= SLIDE_RATIO) {
+                setHasGivenHapticFeedback(false);
+            }
         });
 
         if (slidingRatio > SLIDE_RATIO) {
