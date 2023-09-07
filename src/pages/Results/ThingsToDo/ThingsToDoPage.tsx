@@ -12,24 +12,46 @@ import {
     IonItem,
 } from "@ionic/react";
 import { arrowBack, filter, newspaper } from "ionicons/icons";
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { useLocation } from "react-router";
 import ThingsToDoItem from "../../../components/Results/ThingsToDo/ThingsToDoItem";
+import { ShortCoords } from "../../../interfaces/City";
+import { CapacitorHttp } from "@capacitor/core";
+import { environment } from "../../../../environment.dev";
 
 interface ThingsToDoProps {
-    thingsToDo: any[];
+    coords: ShortCoords;
 }
+
+const OPENTRIPMAP_API_KEY = environment.REACT_APP_OPENTRIPMAP_API_KEY;
+const RADIUS = 24140; // radius in meters (15 miles)
 
 const ThingsToDoPage: React.FC = () => {
     const location = useLocation();
 
-    const [thingsToDo, setThingsToDo] = React.useState<any[]>(
-        (location.state as ThingsToDoProps)?.thingsToDo ?? []
-    );
-
     const addToItinerary = (activity: string) => {
         console.log(activity);
     };
+
+    const [thingsToDo, setThingsToDo] = useState([]);
+    const [coords, setCoords] = useState<ShortCoords>(
+        (location.state as ThingsToDoProps)?.coords ?? {}
+    );
+
+    useEffect(() => {
+        const fetchPlaces = async () => {
+            const url = `https://api.opentripmap.com/0.1/en/places/radius?radius=${RADIUS}&lon=${coords.lng}&lat=${coords.lat}&src_attr=wikidata&rate=3&limit=5&apikey=${OPENTRIPMAP_API_KEY}`;
+            const response = await CapacitorHttp.get({ url });
+
+            return response.data.features.map(
+                (feature: any) => feature.properties
+            );
+        };
+
+        fetchPlaces().then((places) => {
+            setThingsToDo(places);
+        });
+    }, [coords]);
 
     return (
         <IonPage>
@@ -65,7 +87,7 @@ const ThingsToDoPage: React.FC = () => {
                     <IonIcon icon={filter} slot="end" />
                 </IonItem>
                 <IonList>
-                    {thingsToDo?.map((thingToDo) => (
+                    {thingsToDo?.map((thingToDo: any) => (
                         <ThingsToDoItem
                             key={thingToDo.xid}
                             thingToDo={thingToDo}

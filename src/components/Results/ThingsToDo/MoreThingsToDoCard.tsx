@@ -3,6 +3,10 @@ import { ellipsisHorizontal } from "ionicons/icons";
 import React from "react";
 import { createUseStyles } from "react-jss";
 
+interface MoreThingsToDoCardProps {
+    navToThingsToDo: () => void;
+}
+
 const useStyles = createUseStyles({
     card: {
         height: "128px",
@@ -23,7 +27,9 @@ const useStyles = createUseStyles({
     },
 });
 
-const MoreThingsToDoCard: React.FC = () => {
+const MoreThingsToDoCard: React.FC<MoreThingsToDoCardProps> = ({
+    navToThingsToDo,
+}) => {
     const classes = useStyles();
 
     return (
@@ -31,8 +37,7 @@ const MoreThingsToDoCard: React.FC = () => {
             className={classes.card}
             color={"tertiary"}
             button={true}
-            routerLink="/things-to-do"
-            routerDirection="none"
+            onClick={navToThingsToDo}
         >
             <IonRippleEffect />
             <IonIcon

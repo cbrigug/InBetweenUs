@@ -243,9 +243,9 @@ const ThingsToDoSection: React.FC<ThingsToDoSectionProps> = ({ coords }) => {
 
     const navToThingsToDo = () => {
         history.push("/things-to-do", {
-            thingsToDo,
+            coords,
         });
-    }
+    };
 
     // useEffect(() => {
     //     const fetchPlaceIds = async () => {
@@ -296,7 +296,9 @@ const ThingsToDoSection: React.FC<ThingsToDoSectionProps> = ({ coords }) => {
                             </SwiperSlide>
                         ))}
                         <SwiperSlide>
-                            <MoreThingsToDoCard />
+                            <MoreThingsToDoCard
+                                navToThingsToDo={navToThingsToDo}
+                            />
                         </SwiperSlide>
                     </Swiper>
                 </IonRow>
