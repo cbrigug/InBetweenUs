@@ -12,6 +12,7 @@ import React, { useState } from "react";
 import ActivityTypeIcon, { getSingleType } from "./ActivityTypeIcon";
 import { createUseStyles } from "react-jss";
 import { Haptics, ImpactStyle } from "@capacitor/haptics";
+import { capitalize } from "../../../utils/stringUtils";
 
 interface ThingsToDoItemProps {
     thingToDo: any;
@@ -79,10 +80,7 @@ const ThingsToDoItem: React.FC<ThingsToDoItemProps> = ({
                 <IonLabel className="ion-text-wrap">
                     {thingToDo.name}
                     <IonLabel color="primary" style={{ fontSize: "0.8rem" }}>
-                        {getSingleType(thingToDo.kinds)
-                            .charAt(0)
-                            .toUpperCase() +
-                            getSingleType(thingToDo.kinds).slice(1)}
+                        {capitalize(getSingleType(thingToDo.kinds))}
                     </IonLabel>
                 </IonLabel>
             </IonItem>
