@@ -10,6 +10,8 @@ import {
     IonSearchbar,
     IonList,
     IonItem,
+    IonInfiniteScroll,
+    IonInfiniteScrollContent,
 } from "@ionic/react";
 import { arrowBack, filter, newspaper } from "ionicons/icons";
 import React, { useEffect, useState } from "react";
@@ -25,6 +27,7 @@ interface ThingsToDoProps {
 
 const OPENTRIPMAP_API_KEY = environment.REACT_APP_OPENTRIPMAP_API_KEY;
 const RADIUS = 24140; // radius in meters (15 miles)
+const ITEMS_PER_PAGE = 10;
 
 const ThingsToDoPage: React.FC = () => {
     const location = useLocation();
@@ -33,6 +36,7 @@ const ThingsToDoPage: React.FC = () => {
         console.log(activity);
     };
 
+    const [allThingsToDo, setAllThingsToDo] = useState([]);
     const [thingsToDo, setThingsToDo] = useState([]);
     const [coords, setCoords] = useState<ShortCoords>(
         (location.state as ThingsToDoProps)?.coords ?? {}
@@ -40,7 +44,7 @@ const ThingsToDoPage: React.FC = () => {
 
     useEffect(() => {
         const fetchPlaces = async () => {
-            const url = `https://api.opentripmap.com/0.1/en/places/radius?radius=${RADIUS}&lon=${coords.lng}&lat=${coords.lat}&src_attr=wikidata&rate=3&limit=5&apikey=${OPENTRIPMAP_API_KEY}`;
+            const url = `https://api.opentripmap.com/0.1/en/places/radius?radius=${RADIUS}&lon=${coords.lng}&lat=${coords.lat}&rate=3&limit=30&apikey=${OPENTRIPMAP_API_KEY}`;
             const response = await CapacitorHttp.get({ url });
 
             return response.data.features.map(
@@ -49,9 +53,18 @@ const ThingsToDoPage: React.FC = () => {
         };
 
         fetchPlaces().then((places) => {
-            setThingsToDo(places);
+            setAllThingsToDo(places);
+            setThingsToDo(places.slice(0, ITEMS_PER_PAGE));
         });
     }, [coords]);
+
+    const handleInfiniteScroll = () => {
+        const newThingsToDo = allThingsToDo.slice(
+            thingsToDo.length,
+            thingsToDo.length + ITEMS_PER_PAGE
+        );
+        setThingsToDo([...thingsToDo, ...newThingsToDo]);
+    };
 
     return (
         <IonPage>
@@ -95,6 +108,15 @@ const ThingsToDoPage: React.FC = () => {
                         />
                     ))}
                 </IonList>
+                <IonInfiniteScroll
+                    onIonInfinite={(e) => {
+                        console.log("here");
+                        handleInfiniteScroll();
+                        setTimeout(() => e.target.complete(), 500);
+                    }}
+                >
+                    <IonInfiniteScrollContent />
+                </IonInfiniteScroll>
             </IonContent>
         </IonPage>
     );

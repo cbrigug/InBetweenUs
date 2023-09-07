@@ -18,6 +18,7 @@ import {
     fastFood,
     cart,
     bus,
+    help,
 } from "ionicons/icons";
 import { createUseStyles } from "react-jss";
 
@@ -119,7 +120,11 @@ const ActivityTypeIcon: React.FC<ActivityTypeIconProps> = ({
         );
     }
 
-    return null;
+    return (
+        <div className={classes.iconContainer}>
+            <IonIcon icon={help} color={color ?? "light"} />
+        </div>
+    );
 };
 
 export default ActivityTypeIcon;
