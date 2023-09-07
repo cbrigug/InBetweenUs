@@ -16,6 +16,7 @@ import { Swiper, SwiperSlide } from "swiper/react";
 
 import "swiper/css";
 import MoreThingsToDoCard from "./MoreThingsToDoCard";
+import { useHistory } from "react-router";
 
 interface ThingsToDoSectionProps {
     coords: ShortCoords;
@@ -238,6 +239,14 @@ const RADIUS = 24140.2; // 15 miles in meters
 const ThingsToDoSection: React.FC<ThingsToDoSectionProps> = ({ coords }) => {
     const [thingsToDo, setThingsToDo] = useState<any[]>(mockData);
 
+    const history = useHistory();
+
+    const navToThingsToDo = () => {
+        history.push("/things-to-do", {
+            thingsToDo,
+        });
+    }
+
     // useEffect(() => {
     //     const fetchPlaceIds = async () => {
     //         const url = `https://api.opentripmap.com/0.1/en/places/radius?radius=${RADIUS}&lon=${coords.lng}&lat=${coords.lat}&src_attr=wikidata&rate=3&limit=5&apikey=${OPENTRIPMAP_API_KEY}`;
@@ -271,8 +280,7 @@ const ThingsToDoSection: React.FC<ThingsToDoSectionProps> = ({ coords }) => {
                 lines="none"
                 button={true}
                 detail={false}
-                routerLink="/things-to-do"
-                routerDirection="none"
+                onClick={navToThingsToDo}
             >
                 <IonText>Things to&nbsp;</IonText>
                 <IonText color={"primary"}>do</IonText>

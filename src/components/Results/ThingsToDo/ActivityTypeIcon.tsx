@@ -41,6 +41,7 @@ type FontAwesomeIconType =
 
 interface ActivityTypeIconProps {
     types: string;
+    color?: string;
 }
 
 const ionIconMap = {
@@ -77,27 +78,33 @@ const useStyles = createUseStyles({
     },
 });
 
-const ActivityTypeIcon: React.FC<ActivityTypeIconProps> = ({ types }) => {
-    const classes = useStyles();
-
-    // look for type in IonIconType and FontAwesomeIconType
-    const getSingleType = (types: string) => {
-        const allTypes = types.split(",");
-        for (const type of allTypes) {
-            if (type in ionIconMap || type in faIconMap) {
-                return type;
-            }
+// look for type in IonIconType and FontAwesomeIconType
+export const getSingleType = (types: string) => {
+    const allTypes = types.split(",");
+    for (const type of allTypes) {
+        if (type in ionIconMap || type in faIconMap) {
+            return type;
         }
+    }
 
-        return "";
-    };
+    return "";
+};
+
+const ActivityTypeIcon: React.FC<ActivityTypeIconProps> = ({
+    types,
+    color,
+}) => {
+    const classes = useStyles();
 
     const type = getSingleType(types);
 
     if (type in ionIconMap) {
         return (
             <div className={classes.iconContainer}>
-                <IonIcon icon={ionIconMap[type as IonIconType]} color="light" />
+                <IonIcon
+                    icon={ionIconMap[type as IonIconType]}
+                    color={color ?? "light"}
+                />
             </div>
         );
     }
@@ -106,7 +113,9 @@ const ActivityTypeIcon: React.FC<ActivityTypeIconProps> = ({ types }) => {
             <div className={classes.iconContainer}>
                 <FontAwesomeIcon
                     icon={faIconMap[type as FontAwesomeIconType]}
-                    color="var(--ion-color-light)"
+                    color={
+                        `var(--ion-color-${color})` ?? "var(--ion-color-light)"
+                    }
                 />
             </div>
         );

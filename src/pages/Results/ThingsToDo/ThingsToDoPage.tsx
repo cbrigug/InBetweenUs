@@ -7,11 +7,26 @@ import {
     IonText,
     IonContent,
     IonButton,
+    IonSearchbar,
+    IonList,
+    IonItem,
 } from "@ionic/react";
-import { arrowBack, newspaper } from "ionicons/icons";
+import { arrowBack, filter, newspaper } from "ionicons/icons";
 import React from "react";
+import { useLocation } from "react-router";
+import ThingsToDoItem from "../../../components/Results/ThingsToDo/ThingsToDoItem";
+
+interface ThingsToDoProps {
+    thingsToDo: any[];
+}
 
 const ThingsToDoPage: React.FC = () => {
+    const location = useLocation();
+
+    const [thingsToDo, setThingsToDo] = React.useState<any[]>(
+        (location.state as ThingsToDoProps)?.thingsToDo ?? []
+    );
+
     return (
         <IonPage>
             <IonHeader className="ion-no-border">
@@ -40,7 +55,20 @@ const ThingsToDoPage: React.FC = () => {
                     </IonButtons>
                 </IonToolbar>
             </IonHeader>
-            <IonContent className="ion-padding-horizontal"></IonContent>
+            <IonContent className="ion-padding-horizontal">
+                <IonItem lines="none" className="ion-no-padding">
+                    <IonSearchbar className="ion-no-margin" />
+                    <IonIcon icon={filter} slot="end" />
+                </IonItem>
+                <IonList>
+                    {thingsToDo?.map((thingToDo) => (
+                        <ThingsToDoItem
+                            key={thingToDo.xid}
+                            thingToDo={thingToDo}
+                        />
+                    ))}
+                </IonList>
+            </IonContent>
         </IonPage>
     );
 };
