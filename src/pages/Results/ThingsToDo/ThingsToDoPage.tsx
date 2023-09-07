@@ -66,6 +66,14 @@ const ThingsToDoPage: React.FC = () => {
         setThingsToDo([...thingsToDo, ...newThingsToDo]);
     };
 
+    const handleSearch = (term: string) => {
+        const filteredThingsToDo = allThingsToDo.filter((thingToDo: any) =>
+            thingToDo.name.toLowerCase().includes(term.toLowerCase()) ||
+            thingToDo.kinds.includes(term.toLowerCase())
+        );
+        setThingsToDo(filteredThingsToDo);
+    };
+
     return (
         <IonPage>
             <IonHeader className="ion-no-border">
@@ -96,8 +104,11 @@ const ThingsToDoPage: React.FC = () => {
             </IonHeader>
             <IonContent className="ion-padding-horizontal">
                 <IonItem lines="none" className="ion-no-padding">
-                    <IonSearchbar className="ion-no-margin" />
-                    <IonIcon icon={filter} slot="end" />
+                    <IonSearchbar
+                        className="ion-no-margin"
+                        debounce={500}
+                        onIonInput={(e) => handleSearch(e.target.value ?? "")}
+                    />
                 </IonItem>
                 <IonList>
                     {thingsToDo?.map((thingToDo: any) => (
@@ -110,7 +121,6 @@ const ThingsToDoPage: React.FC = () => {
                 </IonList>
                 <IonInfiniteScroll
                     onIonInfinite={(e) => {
-                        console.log("here");
                         handleInfiniteScroll();
                         setTimeout(() => e.target.complete(), 500);
                     }}
