@@ -12,6 +12,7 @@ import {
     IonItem,
     IonInfiniteScroll,
     IonInfiniteScrollContent,
+    IonModal,
 } from "@ionic/react";
 import { arrowBack, filter, newspaper } from "ionicons/icons";
 import React, { useEffect, useState } from "react";
@@ -20,6 +21,7 @@ import ThingsToDoItem from "../../../components/Results/ThingsToDo/ThingsToDoIte
 import { ShortCoords } from "../../../interfaces/City";
 import { CapacitorHttp } from "@capacitor/core";
 import { environment } from "../../../../environment.dev";
+import FilterModalContent from "../../../components/Results/ThingsToDo/FilterModalContent";
 
 interface ThingsToDoProps {
     coords: ShortCoords;
@@ -31,6 +33,7 @@ const ITEMS_PER_PAGE = 10;
 
 const ThingsToDoPage: React.FC = () => {
     const location = useLocation();
+    const modal = useRef<HTMLIonModalElement>(null);
 
     const addToItinerary = (activity: string) => {
         console.log(activity);
@@ -41,8 +44,11 @@ const ThingsToDoPage: React.FC = () => {
     const [coords, setCoords] = useState<ShortCoords>(
         (location.state as ThingsToDoProps)?.coords ?? {}
     );
+    const [activeFilters, setActiveFilters] = useState<string[]>([]);
 
     useEffect(() => {
+        setActiveFilters([]);
+
         const fetchPlaces = async () => {
             const url = `https://api.opentripmap.com/0.1/en/places/radius?radius=${RADIUS}&lon=${coords.lng}&lat=${coords.lat}&rate=3&limit=30&apikey=${OPENTRIPMAP_API_KEY}`;
             const response = await CapacitorHttp.get({ url });
@@ -67,9 +73,19 @@ const ThingsToDoPage: React.FC = () => {
     };
 
     const handleSearch = (term: string) => {
+        const filteredThingsToDo = allThingsToDo.filter(
+            (thingToDo: any) =>
+                thingToDo.name.toLowerCase().includes(term.toLowerCase()) ||
+                thingToDo.kinds.includes(term.toLowerCase())
+        );
+        setThingsToDo(filteredThingsToDo);
+    };
+
+    const handleFilters = (filters: string[]) => {
+        setActiveFilters(filters);
+
         const filteredThingsToDo = allThingsToDo.filter((thingToDo: any) =>
-            thingToDo.name.toLowerCase().includes(term.toLowerCase()) ||
-            thingToDo.kinds.includes(term.toLowerCase())
+            filters.some((filter) => thingToDo.kinds.includes(filter))
         );
         setThingsToDo(filteredThingsToDo);
     };
@@ -127,6 +143,17 @@ const ThingsToDoPage: React.FC = () => {
                 >
                     <IonInfiniteScrollContent />
                 </IonInfiniteScroll>
+                <IonModal
+                    ref={modal}
+                    trigger="open-modal"
+                    initialBreakpoint={0.85}
+                    breakpoints={[0.95, 0.85, 0]}
+                >
+                    <FilterModalContent
+                        handleFilters={handleFilters}
+                        activeFilters={activeFilters}
+                    />
+                </IonModal>
             </IonContent>
         </IonPage>
     );

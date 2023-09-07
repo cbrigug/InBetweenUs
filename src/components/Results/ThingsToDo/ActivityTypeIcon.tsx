@@ -36,16 +36,17 @@ type FontAwesomeIconType =
     | "architecture"
     | "historic"
     | "natural"
-    | "industrial_facilities"
+    | "industrial"
     | "religion"
     | "banks";
 
 interface ActivityTypeIconProps {
     types: string;
     color: string;
+    className?: string;
 }
 
-const ionIconMap = {
+export const ionIconMap = {
     accomodations: bed,
     adult: wine,
     amusements: balloon,
@@ -56,11 +57,11 @@ const ionIconMap = {
     transport: bus,
 };
 
-const faIconMap = {
+export const faIconMap = {
     architecture: faBridge,
     historic: faLandmark,
     natural: faTree,
-    industrial_facilities: faIndustry,
+    industrial: faIndustry,
     religion: faPlaceOfWorship,
     banks: faPiggyBank,
 };
@@ -81,7 +82,9 @@ const useStyles = createUseStyles({
 
 // look for type in IonIconType and FontAwesomeIconType
 export const getSingleType = (types: string) => {
-    const allTypes = types.split(",");
+    const allTypes = types
+        .replace("industrial_facilities", "industrial")
+        .split(",");
     for (const type of allTypes) {
         if (type in ionIconMap || type in faIconMap) {
             return type;
@@ -94,6 +97,7 @@ export const getSingleType = (types: string) => {
 const ActivityTypeIcon: React.FC<ActivityTypeIconProps> = ({
     types,
     color,
+    className,
 }) => {
     const classes = useStyles();
 
@@ -101,8 +105,9 @@ const ActivityTypeIcon: React.FC<ActivityTypeIconProps> = ({
 
     if (type in ionIconMap) {
         return (
-            <div className={classes.iconContainer}>
+            <div className={className ? className : classes.iconContainer}>
                 <IonIcon
+                    className={className}
                     icon={ionIconMap[type as IonIconType]}
                     color={color ?? "light"}
                 />
@@ -111,8 +116,9 @@ const ActivityTypeIcon: React.FC<ActivityTypeIconProps> = ({
     }
     if (type in faIconMap) {
         return (
-            <div className={classes.iconContainer}>
+            <div className={className ? className : classes.iconContainer}>
                 <FontAwesomeIcon
+                    className={className}
                     icon={faIconMap[type as FontAwesomeIconType]}
                     color={`var(--ion-color-${color})`}
                 />
@@ -121,8 +127,12 @@ const ActivityTypeIcon: React.FC<ActivityTypeIconProps> = ({
     }
 
     return (
-        <div className={classes.iconContainer}>
-            <IonIcon icon={help} color={color ?? "light"} />
+        <div className={className ? className : classes.iconContainer}>
+            <IonIcon
+                className={className}
+                icon={help}
+                color={color ?? "light"}
+            />
         </div>
     );
 };
