@@ -91,7 +91,7 @@ const ThingToDoCard: React.FC<ThingToDoCardProps> = ({ thingToDo }) => {
                         </IonText>
                     </>
                 )}
-                <ActivityTypeIcon types={thingToDo.kinds} />
+                <ActivityTypeIcon types={thingToDo.kinds} color="light" />
             </IonCard>
             {/* Back of Card */}
             <IonCard

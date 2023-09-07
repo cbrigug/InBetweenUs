@@ -41,7 +41,7 @@ type FontAwesomeIconType =
 
 interface ActivityTypeIconProps {
     types: string;
-    color?: string;
+    color: string;
 }
 
 const ionIconMap = {
@@ -113,9 +113,7 @@ const ActivityTypeIcon: React.FC<ActivityTypeIconProps> = ({
             <div className={classes.iconContainer}>
                 <FontAwesomeIcon
                     icon={faIconMap[type as FontAwesomeIconType]}
-                    color={
-                        `var(--ion-color-${color})` ?? "var(--ion-color-light)"
-                    }
+                    color={`var(--ion-color-${color})`}
                 />
             </div>
         );
