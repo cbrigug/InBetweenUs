@@ -27,6 +27,10 @@ const ThingsToDoPage: React.FC = () => {
         (location.state as ThingsToDoProps)?.thingsToDo ?? []
     );
 
+    const addToItinerary = (activity: string) => {
+        console.log(activity);
+    };
+
     return (
         <IonPage>
             <IonHeader className="ion-no-border">
@@ -65,6 +69,7 @@ const ThingsToDoPage: React.FC = () => {
                         <ThingsToDoItem
                             key={thingToDo.xid}
                             thingToDo={thingToDo}
+                            addToItinerary={addToItinerary}
                         />
                     ))}
                 </IonList>
