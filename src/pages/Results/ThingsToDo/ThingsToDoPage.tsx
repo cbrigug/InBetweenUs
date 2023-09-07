@@ -13,14 +13,19 @@ import {
     IonInfiniteScroll,
     IonInfiniteScrollContent,
     IonModal,
+    IonLabel,
+    IonChip,
 } from "@ionic/react";
-import { arrowBack, filter, newspaper } from "ionicons/icons";
-import React, { useEffect, useState } from "react";
+import { arrowBack, close, filter, newspaper } from "ionicons/icons";
+import React, { useEffect, useRef, useState } from "react";
 import { useLocation } from "react-router";
 import ThingsToDoItem from "../../../components/Results/ThingsToDo/ThingsToDoItem";
 import { ShortCoords } from "../../../interfaces/City";
 import { CapacitorHttp } from "@capacitor/core";
 import { environment } from "../../../../environment.dev";
+import { capitalize } from "../../../utils/stringUtils";
+import ActivityTypeIcon from "../../../components/Results/ThingsToDo/ActivityTypeIcon";
+import { createUseStyles } from "react-jss";
 import FilterModalContent from "../../../components/Results/ThingsToDo/FilterModalContent";
 
 interface ThingsToDoProps {
@@ -31,7 +36,15 @@ const OPENTRIPMAP_API_KEY = environment.REACT_APP_OPENTRIPMAP_API_KEY;
 const RADIUS = 24140; // radius in meters (15 miles)
 const ITEMS_PER_PAGE = 10;
 
+const useStyles = createUseStyles({
+    chipIcon: {
+        color: "black",
+    },
+});
+
 const ThingsToDoPage: React.FC = () => {
+    const classes = useStyles();
+
     const location = useLocation();
     const modal = useRef<HTMLIonModalElement>(null);
 
@@ -90,6 +103,10 @@ const ThingsToDoPage: React.FC = () => {
         setThingsToDo(filteredThingsToDo);
     };
 
+    const removeChip = (activityType: string) => {
+        setActiveFilters((prevFilters) => prevFilters.filter((filter) => filter !== activityType));
+    };
+
     return (
         <IonPage>
             <IonHeader className="ion-no-border">
@@ -125,7 +142,28 @@ const ThingsToDoPage: React.FC = () => {
                         debounce={500}
                         onIonInput={(e) => handleSearch(e.target.value ?? "")}
                     />
+                    <IonIcon
+                        icon={filter}
+                        slot="end"
+                        id="open-modal"
+                        className="ion-no-margin"
+                    />
                 </IonItem>
+                <IonList>
+                    {activeFilters.map((filter) => (
+                        <IonChip color="primary" onClick={() => removeChip(filter)}>
+                            <ActivityTypeIcon
+                                types={filter}
+                                color="dark"
+                                className={classes.chipIcon}
+                            />
+                            <IonLabel color="dark">
+                                &nbsp;{capitalize(filter)}
+                            </IonLabel>
+                            <IonIcon icon={close} />
+                        </IonChip>
+                    ))}
+                </IonList>
                 <IonList>
                     {thingsToDo?.map((thingToDo: any) => (
                         <ThingsToDoItem
