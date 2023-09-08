@@ -27,6 +27,7 @@ import { CapacitorHttp } from "@capacitor/core";
 import { FormDataType } from "../../components/Home/PersonCard/PersonModal";
 import DrivingTimeBanner from "../../components/Results/DrivingTimeBanner";
 import ThingsToDoSection from "../../components/Results/ThingsToDo/ThingsToDoSection";
+import NearbyCitiesSection from "../../components/Results/NearbyCities/NearbyCitiesSection";
 
 interface ResultsProps {
     personA: FormDataType;
@@ -346,6 +347,8 @@ const Results: React.FC = () => {
                         <ThingsToDoSection
                             coords={middleCityList[index].position}
                         />
+
+                        <NearbyCitiesSection cities={middleCityList} />
                     </>
                 ) : (
                     <NoResultsFound />

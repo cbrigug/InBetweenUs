@@ -33,6 +33,7 @@ import "./theme/variables.css";
 
 import Results from "./pages/Results/Results";
 import ThingsToDoPage from "./pages/Results/ThingsToDo/ThingsToDoPage";
+import NearbyCitiesPage from "./pages/Results/NearbyCities/NearbyCitiesPage";
 
 setupIonicReact();
 
@@ -48,6 +49,9 @@ const App: React.FC = () => (
           </Route>
           <Route exact path="/things-to-do">
             <ThingsToDoPage />
+          </Route>
+          <Route exact path="/find-nearby-cities">
+            <NearbyCitiesPage />
           </Route>
           <Route exact path="/">
             <Redirect to="/home" />
