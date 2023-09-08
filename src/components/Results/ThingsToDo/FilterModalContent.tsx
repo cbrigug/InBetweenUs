@@ -7,12 +7,12 @@ import {
 import ThingsToDoTypeCard from "./ThingsToDoTypeCard";
 
 interface FilterModalContentProps {
-    handleFilters: (filters: string[]) => void;
+    setActiveFilters: React.Dispatch<React.SetStateAction<string[]>>;
     activeFilters: string[];
 }
 
 const FilterModalContent: React.FC<FilterModalContentProps> = ({
-    handleFilters,
+    setActiveFilters,
     activeFilters
 }) => {
     const [filters, setFilters] = useState<string[]>(activeFilters);
@@ -23,11 +23,11 @@ const FilterModalContent: React.FC<FilterModalContentProps> = ({
         if (filters.includes(filter)) {
             updatedFilters = filters.filter((f) => f !== filter);
         } else {
-            updatedFilters.push(filter);
+            updatedFilters = [...updatedFilters, filter]
         }
 
         setFilters(updatedFilters);
-        handleFilters(updatedFilters);
+        setActiveFilters(updatedFilters);
     };
 
     const types = Object.keys(ionIconMap).concat(Object.keys(faIconMap)).sort();

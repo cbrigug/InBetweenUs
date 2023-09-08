@@ -15,6 +15,7 @@ import {
     IonModal,
     IonLabel,
     IonChip,
+    IonRow,
 } from "@ionic/react";
 import { arrowBack, close, filter, newspaper } from "ionicons/icons";
 import React, { useEffect, useRef, useState } from "react";
@@ -52,11 +53,19 @@ const ThingsToDoPage: React.FC = () => {
         console.log(activity);
     };
 
+    // full list of things to do, should not change
     const [allThingsToDo, setAllThingsToDo] = useState([]);
-    const [thingsToDo, setThingsToDo] = useState([]);
+
+    // potentially filtered list of all things to do, should change
+    const [filteredThingsToDo, setFilteredThingsToDo] = useState<any[]>([]);
+
+    // list of things to do to display that the user sees
+    const [thingsToDo, setThingsToDo] = useState<any[]>([]);
     const [coords, setCoords] = useState<ShortCoords>(
         (location.state as ThingsToDoProps)?.coords ?? {}
     );
+
+    const [search, setSearch] = useState("");
     const [activeFilters, setActiveFilters] = useState<string[]>([]);
 
     useEffect(() => {
@@ -64,6 +73,7 @@ const ThingsToDoPage: React.FC = () => {
 
         const fetchPlaces = async () => {
             const url = `https://api.opentripmap.com/0.1/en/places/radius?radius=${RADIUS}&lon=${coords.lng}&lat=${coords.lat}&rate=3&limit=30&apikey=${OPENTRIPMAP_API_KEY}`;
+
             const response = await CapacitorHttp.get({ url });
 
             return response.data.features.map(
@@ -73,38 +83,61 @@ const ThingsToDoPage: React.FC = () => {
 
         fetchPlaces().then((places) => {
             setAllThingsToDo(places);
+            setFilteredThingsToDo(places);
             setThingsToDo(places.slice(0, ITEMS_PER_PAGE));
         });
     }, [coords]);
 
     const handleInfiniteScroll = () => {
-        const newThingsToDo = allThingsToDo.slice(
-            thingsToDo.length,
+        // new items to display
+        const newThingsToDo = filteredThingsToDo.slice(
+            0,
             thingsToDo.length + ITEMS_PER_PAGE
         );
-        setThingsToDo([...thingsToDo, ...newThingsToDo]);
+
+        setThingsToDo(newThingsToDo);
     };
 
-    const handleSearch = (term: string) => {
-        const filteredThingsToDo = allThingsToDo.filter(
-            (thingToDo: any) =>
-                thingToDo.name.toLowerCase().includes(term.toLowerCase()) ||
-                thingToDo.kinds.includes(term.toLowerCase())
-        );
+    useEffect(() => {
+        let filteredThingsToDo = [...allThingsToDo];
+
+        if (search && activeFilters.length > 0) {
+            const curThingsToDo = filteredThingsToDo.filter(
+                (thingToDo: any) =>
+                    (thingToDo.name
+                        .toLowerCase()
+                        .includes(search.toLowerCase()) ||
+                        thingToDo.kinds.includes(search.toLowerCase())) &&
+                    activeFilters.some((filter) =>
+                        thingToDo.kinds.includes(filter)
+                    )
+            );
+            filteredThingsToDo = curThingsToDo;
+        } else if (search) {
+            const curThingsToDo = filteredThingsToDo.filter(
+                (thingToDo: any) =>
+                    thingToDo.name
+                        .toLowerCase()
+                        .includes(search.toLowerCase()) ||
+                    thingToDo.kinds.includes(search.toLowerCase())
+            );
+            filteredThingsToDo = curThingsToDo;
+        } else if (activeFilters.length > 0) {
+            const curThingsToDo = filteredThingsToDo.filter((thingToDo: any) =>
+                activeFilters.some((filter) => thingToDo.kinds.includes(filter))
+            );
+            filteredThingsToDo = curThingsToDo;
+        }
+
+        setFilteredThingsToDo(filteredThingsToDo);
         setThingsToDo(filteredThingsToDo);
-    };
-
-    const handleFilters = (filters: string[]) => {
-        setActiveFilters(filters);
-
-        const filteredThingsToDo = allThingsToDo.filter((thingToDo: any) =>
-            filters.some((filter) => thingToDo.kinds.includes(filter))
-        );
-        setThingsToDo(filteredThingsToDo);
-    };
+    }, [search, activeFilters]);
 
     const removeChip = (activityType: string) => {
-        setActiveFilters((prevFilters) => prevFilters.filter((filter) => filter !== activityType));
+        const curFilters = activeFilters.filter(
+            (filter) => filter !== activityType
+        );
+        setActiveFilters(curFilters);
     };
 
     return (
@@ -140,7 +173,7 @@ const ThingsToDoPage: React.FC = () => {
                     <IonSearchbar
                         className="ion-no-margin"
                         debounce={500}
-                        onIonInput={(e) => handleSearch(e.target.value ?? "")}
+                        onIonInput={(e) => setSearch(e.target.value ?? "")}
                     />
                     <IonIcon
                         icon={filter}
@@ -151,7 +184,11 @@ const ThingsToDoPage: React.FC = () => {
                 </IonItem>
                 <IonList>
                     {activeFilters.map((filter) => (
-                        <IonChip color="primary" onClick={() => removeChip(filter)}>
+                        <IonChip
+                            key={filter}
+                            color="primary"
+                            onClick={() => removeChip(filter)}
+                        >
                             <ActivityTypeIcon
                                 types={filter}
                                 color="dark"
@@ -164,20 +201,27 @@ const ThingsToDoPage: React.FC = () => {
                         </IonChip>
                     ))}
                 </IonList>
-                <IonList>
-                    {thingsToDo?.map((thingToDo: any) => (
-                        <ThingsToDoItem
-                            key={thingToDo.xid}
-                            thingToDo={thingToDo}
-                            addToItinerary={addToItinerary}
-                        />
-                    ))}
-                </IonList>
+                {thingsToDo.length > 0 ? (
+                    <IonList>
+                        {thingsToDo.map((thingToDo: any) => (
+                            <ThingsToDoItem
+                                key={thingToDo.xid}
+                                thingToDo={thingToDo}
+                                addToItinerary={addToItinerary}
+                            />
+                        ))}
+                    </IonList>
+                ) : (
+                    <IonRow className="ion-justify-content-center">
+                        <IonText color="secondary">No results found</IonText>
+                    </IonRow>
+                )}
                 <IonInfiniteScroll
                     onIonInfinite={(e) => {
                         handleInfiniteScroll();
                         setTimeout(() => e.target.complete(), 500);
                     }}
+                    disabled={thingsToDo.length === filteredThingsToDo.length}
                 >
                     <IonInfiniteScrollContent />
                 </IonInfiniteScroll>
@@ -188,7 +232,7 @@ const ThingsToDoPage: React.FC = () => {
                     breakpoints={[0.95, 0.85, 0]}
                 >
                     <FilterModalContent
-                        handleFilters={handleFilters}
+                        setActiveFilters={setActiveFilters}
                         activeFilters={activeFilters}
                     />
                 </IonModal>
