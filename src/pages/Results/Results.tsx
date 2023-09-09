@@ -176,8 +176,8 @@ const Results: React.FC = () => {
     const [personA, setPersonA] = useState<FormDataType>(mockPersonA);
     const [personB, setPersonB] = useState<FormDataType>(mockPersonB);
 
+    const [curCity, setCurCity] = useState<City>({} as City);
     const [middleCityList, setMiddleCityList] = useState<City[]>([]);
-    const [index, setIndex] = useState(0);
 
     const [personACoords, setpersonACoords] = useState<Coordinates>({
         latitude: 0,
@@ -212,7 +212,6 @@ const Results: React.FC = () => {
 
             try {
                 if (personA.coordinates && personB.coordinates) {
-                    setIndex(0);
                     setIsLoading(true);
                     const personACoords = personA.coordinates;
                     const personBCoords = personB.coordinates;
@@ -229,6 +228,11 @@ const Results: React.FC = () => {
                     );
 
                     if (cachedDataForCurrentFlexibility) {
+                        if (middleCityList.length === 0) {
+                            setCurCity(
+                                cachedDataForCurrentFlexibility.cities[0]
+                            );
+                        }
                         setMiddleCityList(
                             cachedDataForCurrentFlexibility.cities
                         );
@@ -268,6 +272,9 @@ const Results: React.FC = () => {
                             return differenceA - differenceB;
                         });
 
+                        if (middleCityList.length === 0) {
+                            setCurCity(allCities[0]);
+                        }
                         setMiddleCityList(allCities);
                         if (allCities.length > 0) {
                             const newCachedCityData = {
@@ -295,11 +302,6 @@ const Results: React.FC = () => {
         fetchCoords();
     }, [personA, personB, flexibility]);
 
-    const findAnother = (index: number) => {
-        const nextIndex = (index + 1) % middleCityList.length; // Calculate the next index cyclically
-        setIndex(nextIndex);
-    };
-
     return (
         <IonPage>
             <IonHeader className="ion-no-border">
@@ -315,11 +317,9 @@ const Results: React.FC = () => {
                         </IonButton>
                     </IonButtons>
                     <div className="ion-text-center">
-                        <IonText>
-                            {middleCityList[index]?.address.city},&nbsp;
-                        </IonText>
+                        <IonText>{curCity?.address?.city},&nbsp;</IonText>
                         <IonText color={"primary"}>
-                            {middleCityList[index]?.address.stateCode}
+                            {curCity?.address?.stateCode}
                         </IonText>
                     </div>
                     <IonButtons slot="end">
@@ -335,25 +335,25 @@ const Results: React.FC = () => {
                 </IonToolbar>
             </IonHeader>
             <IonContent className="ion-padding-horizontal">
-                {middleCityList[index] ? (
+                {curCity ? (
                     <>
                         <DrivingTimeBanner
                             personA={personA}
                             personB={personB}
-                            drivingTimeA={middleCityList[index].drivingTimeA}
-                            drivingTimeB={middleCityList[index].drivingTimeB}
+                            drivingTimeA={curCity?.drivingTimeA}
+                            drivingTimeB={curCity?.drivingTimeB}
                         />
 
-                        <ThingsToDoSection
-                            coords={middleCityList[index].position}
-                        />
+                        <ThingsToDoSection coords={curCity?.position} />
 
                         <NearbyCitiesSection
                             personA={personA}
                             personB={personB}
                             cities={middleCityList.filter(
-                                (city) => city.id != middleCityList[index].id
+                                (city) => city.id != curCity.id
                             )}
+                            setFlexibility={setFlexibility}
+                            setCurrentCity={setCurCity}
                         />
                     </>
                 ) : (

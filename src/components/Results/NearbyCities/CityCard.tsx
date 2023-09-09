@@ -25,6 +25,7 @@ interface CityCardProps {
     personA: FormDataType;
     personB: FormDataType;
     city: City;
+    setCurrentCity: (city: City) => void;
 }
 
 const useStyles = createUseStyles({
@@ -66,7 +67,12 @@ const useStyles = createUseStyles({
     },
 });
 
-const CityCard: React.FC<CityCardProps> = ({ city, personA, personB }) => {
+const CityCard: React.FC<CityCardProps> = ({
+    city,
+    personA,
+    personB,
+    setCurrentCity,
+}) => {
     const classes = useStyles();
 
     const [isFlipped, setIsFlipped] = useState(false);
@@ -85,7 +91,7 @@ const CityCard: React.FC<CityCardProps> = ({ city, personA, personB }) => {
                             className={classes.iconBtn}
                             icon={arrowForwardCircle}
                             color="primary"
-                            onClick={() => console.log("Here")}
+                            onClick={() => setCurrentCity(city)}
                         />
                     </IonRow>
                     <IonRow>

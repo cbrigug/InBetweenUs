@@ -20,6 +20,8 @@ interface NearbyCitiesSectionProps {
     personA: FormDataType;
     personB: FormDataType;
     cities: City[];
+    setFlexibility: (flexibility: number) => void;
+    setCurrentCity: (city: City) => void;
 }
 
 const useStyles = createUseStyles({
@@ -51,6 +53,8 @@ const NearbyCitiesSection: React.FC<NearbyCitiesSectionProps> = ({
     cities,
     personA,
     personB,
+    setFlexibility,
+    setCurrentCity,
 }) => {
     const classes = useStyles();
     const history = useHistory();
@@ -71,7 +75,7 @@ const NearbyCitiesSection: React.FC<NearbyCitiesSectionProps> = ({
                 button={true}
                 detail={false}
             >
-                <IonText>Find</IonText>
+                <IonText>Central</IonText>
                 <IonText color={"primary"}>&nbsp;nearby&nbsp;</IonText>
                 <IonText>cities</IonText>
                 <IonIcon
@@ -90,18 +94,22 @@ const NearbyCitiesSection: React.FC<NearbyCitiesSectionProps> = ({
                     min={0}
                     max={3}
                     className="ion-padding-horizontal"
+                    onIonChange={(e) => {
+                        setFlexibility(e.detail.value as number);
+                    }}
                 ></IonRange>
             )}
 
             <IonGrid className="ion-no-padding">
                 <IonRow className="ion-margin-top">
-                    <Swiper slidesPerView={2}>
+                    <Swiper slidesPerView={2} >
                         {cities.map((city) => (
                             <SwiperSlide key={city.title}>
                                 <CityCard
                                     personA={personA}
                                     personB={personB}
                                     city={city}
+                                    setCurrentCity={setCurrentCity}
                                 />
                             </SwiperSlide>
                         ))}
