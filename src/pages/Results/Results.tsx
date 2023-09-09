@@ -349,6 +349,8 @@ const Results: React.FC = () => {
                         />
 
                         <NearbyCitiesSection
+                            personA={personA}
+                            personB={personB}
                             cities={middleCityList.filter(
                                 (city) => city.id != middleCityList[index].id
                             )}

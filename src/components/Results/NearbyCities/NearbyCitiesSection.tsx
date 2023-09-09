@@ -14,8 +14,11 @@ import { City } from "../../../interfaces/City";
 import { useHistory } from "react-router";
 import CityCard from "./CityCard";
 import { createUseStyles } from "react-jss";
+import { FormDataType } from "../../Home/PersonCard/PersonModal";
 
 interface NearbyCitiesSectionProps {
+    personA: FormDataType;
+    personB: FormDataType;
     cities: City[];
 }
 
@@ -46,6 +49,8 @@ const useStyles = createUseStyles({
 
 const NearbyCitiesSection: React.FC<NearbyCitiesSectionProps> = ({
     cities,
+    personA,
+    personB,
 }) => {
     const classes = useStyles();
     const history = useHistory();
@@ -93,7 +98,11 @@ const NearbyCitiesSection: React.FC<NearbyCitiesSectionProps> = ({
                     <Swiper slidesPerView={2}>
                         {cities.map((city) => (
                             <SwiperSlide key={city.title}>
-                                <CityCard city={city} />
+                                <CityCard
+                                    personA={personA}
+                                    personB={personB}
+                                    city={city}
+                                />
                             </SwiperSlide>
                         ))}
                     </Swiper>

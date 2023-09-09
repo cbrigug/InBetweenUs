@@ -5,9 +5,10 @@ interface AvatarProps {
     name: string;
     size: string;
     image?: string;
+    textSize?: string;
 }
 
-const Avatar: React.FC<AvatarProps> = ({ name, size, image }) => {
+const Avatar: React.FC<AvatarProps> = ({ name, size, image, textSize }) => {
     const nameParts = name.split(" ");
 
     const circle = {
@@ -15,7 +16,7 @@ const Avatar: React.FC<AvatarProps> = ({ name, size, image }) => {
         height: size,
         lineHeight: size,
         borderRadius: "50%",
-        fontSize: "32px",
+        fontSize: textSize ? textSize : "2rem",
         color: "white",
         backgroundColor: "var(--ion-color-primary)",
         backgroundImage: image,
