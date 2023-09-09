@@ -348,7 +348,11 @@ const Results: React.FC = () => {
                             coords={middleCityList[index].position}
                         />
 
-                        <NearbyCitiesSection cities={middleCityList} />
+                        <NearbyCitiesSection
+                            cities={middleCityList.filter(
+                                (city) => city.id != middleCityList[index].id
+                            )}
+                        />
                     </>
                 ) : (
                     <NoResultsFound />

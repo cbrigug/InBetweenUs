@@ -15,6 +15,7 @@ interface Address {
 }
 
 export interface City {
+    id: string;
     title: string;
     position: ShortCoords;
     address: Address;
