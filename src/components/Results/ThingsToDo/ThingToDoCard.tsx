@@ -23,7 +23,6 @@ const useStyles = createUseStyles({
     image: {
         height: "100%",
         objectFit: "cover",
-        zIndex: -1,
     },
     frontText: {
         background: "radial-gradient(black, transparent)",
