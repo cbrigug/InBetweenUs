@@ -1,24 +1,35 @@
 import { IonAlert } from "@ionic/react";
 import React from "react";
+import { ItineraryDay } from "./Itinerary";
 
-interface ItineraryAddAlertProps {
-    index: number;
+interface ItineraryAddUpdateProps {
+    addUpdateDay: (day: ItineraryDay) => void;
+    index?: number; // need for ItineraryAddCard
+    data?: ItineraryDay; // need for ItineraryCard
 }
 
-const ItineraryAddAlert: React.FC<ItineraryAddAlertProps> = ({ index }) => {
+const ItineraryAddUpdate: React.FC<ItineraryAddUpdateProps> = ({
+    addUpdateDay,
+    index,
+    data,
+}) => {
     return (
         <IonAlert
-            trigger="present-alert"
-            header={`Day ${index}`}
+            animated
+            trigger={index ? "present-alert" : `present-alert-${data?.index}`}
+            header={index ? "Add Day" : `Day ${data?.index}`}
             buttons={[
                 {
                     text: "Cancel",
                     role: "cancel",
                 },
                 {
-                    text: "Add",
-                    handler: (data) => {
-                        console.log(data);
+                    text: index ? "Add" : "Update",
+                    handler: (val) => {
+                        addUpdateDay({
+                            index: index ? index : data?.index,
+                            ...val,
+                        });
                     },
                 },
             ]}
@@ -30,6 +41,7 @@ const ItineraryAddAlert: React.FC<ItineraryAddAlertProps> = ({ index }) => {
                     attributes: {
                         maxLength: 30,
                     },
+                    value: data?.morning,
                 },
                 {
                     name: "afternoon",
@@ -38,6 +50,7 @@ const ItineraryAddAlert: React.FC<ItineraryAddAlertProps> = ({ index }) => {
                     attributes: {
                         maxLength: 30,
                     },
+                    value: data?.afternoon,
                 },
                 {
                     name: "evening",
@@ -46,13 +59,11 @@ const ItineraryAddAlert: React.FC<ItineraryAddAlertProps> = ({ index }) => {
                     attributes: {
                         maxLength: 30,
                     },
+                    value: data?.evening,
                 },
             ]}
-            onSubmit={(data) => {
-                console.log(data);
-            }}
-        ></IonAlert>
+        />
     );
 };
 
-export default ItineraryAddAlert;
+export default ItineraryAddUpdate;

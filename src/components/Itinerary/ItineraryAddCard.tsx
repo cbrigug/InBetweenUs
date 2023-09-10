@@ -11,9 +11,13 @@ import {
 } from "@ionic/react";
 import React from "react";
 import { createUseStyles } from "react-jss";
-import ItineraryAddAlert from "./ItineraryAddAlert";
+import ItineraryAddUpdate from "./ItineraryAddUpdate";
+import { ItineraryDay } from "./Itinerary";
 
-interface ItineraryAddCardProps {}
+interface ItineraryAddCardProps {
+    index: number;
+    addUpdateDay: (day: ItineraryDay) => void;
+}
 
 const useStyles = createUseStyles({
     card: {
@@ -31,11 +35,15 @@ const useStyles = createUseStyles({
     },
 });
 
-const ItineraryAddCard: React.FC<ItineraryAddCardProps> = ({}) => {
+const ItineraryAddCard: React.FC<ItineraryAddCardProps> = ({ index, addUpdateDay }) => {
     const classes = useStyles();
 
     return (
-        <IonCard className={`ion-no-margin ${classes.card}`} button id="present-alert">
+        <IonCard
+            className={`ion-no-margin ${classes.card}`}
+            button
+            id="present-alert"
+        >
             <IonRippleEffect />
             <IonGrid>
                 <IonRow className="ion-justify-content-center ion-margin-top">
@@ -49,7 +57,7 @@ const ItineraryAddCard: React.FC<ItineraryAddCardProps> = ({}) => {
                     <IonText className={classes.text}>Add Day</IonText>
                 </IonRow>
             </IonGrid>
-            <ItineraryAddAlert index={1} />
+            <ItineraryAddUpdate index={index} addUpdateDay={addUpdateDay} />
         </IonCard>
     );
 };
