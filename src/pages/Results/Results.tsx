@@ -28,6 +28,7 @@ import { FormDataType } from "../../components/Home/PersonCard/PersonModal";
 import DrivingTimeBanner from "../../components/Results/DrivingTimeBanner";
 import ThingsToDoSection from "../../components/Results/ThingsToDo/ThingsToDoSection";
 import NearbyCitiesSection from "../../components/Results/NearbyCities/NearbyCitiesSection";
+import Itinerary from "../../components/Itinerary/Itinerary";
 
 interface ResultsProps {
     personA: FormDataType;
@@ -202,6 +203,14 @@ const Results: React.FC = () => {
             position: position,
         });
     };
+
+    // Itinerary Modal
+    const [isModalOpen, setIsModalOpen] = useState(false);
+
+    const toggleModal = () => {
+        setIsModalOpen(!isModalOpen);
+    };
+
     const [cachedCities, setCachedCities] = useState<CachedCityData[]>([]);
 
     useEffect(() => {
@@ -323,7 +332,7 @@ const Results: React.FC = () => {
                         </IonText>
                     </div>
                     <IonButtons slot="end">
-                        <IonButton>
+                        <IonButton onClick={toggleModal}>
                             <IonIcon
                                 slot="icon-only"
                                 icon={newspaper}
@@ -360,6 +369,7 @@ const Results: React.FC = () => {
                     <NoResultsFound />
                 )}
                 <IonLoading isOpen={isLoading} />
+                <Itinerary isOpen={isModalOpen} toggleModal={toggleModal} />
             </IonContent>
         </IonPage>
     );
