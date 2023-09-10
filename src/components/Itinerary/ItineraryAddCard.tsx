@@ -11,6 +11,7 @@ import {
 } from "@ionic/react";
 import React from "react";
 import { createUseStyles } from "react-jss";
+import ItineraryAddAlert from "./ItineraryAddAlert";
 
 interface ItineraryAddCardProps {}
 
@@ -34,7 +35,7 @@ const ItineraryAddCard: React.FC<ItineraryAddCardProps> = ({}) => {
     const classes = useStyles();
 
     return (
-        <IonCard className={`ion-no-margin ${classes.card}`} button>
+        <IonCard className={`ion-no-margin ${classes.card}`} button id="present-alert">
             <IonRippleEffect />
             <IonGrid>
                 <IonRow className="ion-justify-content-center ion-margin-top">
@@ -45,9 +46,10 @@ const ItineraryAddCard: React.FC<ItineraryAddCardProps> = ({}) => {
                     />
                 </IonRow>
                 <IonRow className="ion-justify-content-center">
-                    <IonText className={classes.text}>Add day</IonText>
+                    <IonText className={classes.text}>Add Day</IonText>
                 </IonRow>
             </IonGrid>
+            <ItineraryAddAlert index={1} />
         </IonCard>
     );
 };
