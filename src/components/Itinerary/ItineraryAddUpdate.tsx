@@ -19,7 +19,7 @@ interface ItineraryAddUpdateProps {
 
 const useStyles = createUseStyles({
     modal: {
-        "--width": "72%",
+        "--width": "75%",
         "--height": "fit-content",
         "--background": "var(--ion-color-tertiary)",
         "--border-radius": "16px",
@@ -106,12 +106,15 @@ const ItineraryAddUpdate: React.FC<ItineraryAddUpdateProps> = ({
                         className={classes.item}
                     >
                         <IonInput
-                            placeholder="Morning"
+                            counter
                             value={morning}
                             onIonInput={(e) =>
                                 setMorning(e.target.value as string)
                             }
                             maxlength={30}
+                            label="Morning"
+                            labelPlacement="floating"
+                            clearInput
                         />
                     </IonItem>
                     <IonItem
@@ -120,26 +123,32 @@ const ItineraryAddUpdate: React.FC<ItineraryAddUpdateProps> = ({
                         className={classes.item}
                     >
                         <IonInput
-                            placeholder="Afternoon"
+                            counter
                             value={afternoon}
                             onIonInput={(e) =>
                                 setAfternoon(e.target.value as string)
                             }
                             maxlength={30}
+                            label="Afternoon"
+                            labelPlacement="floating"
+                            clearInput
                         />
                     </IonItem>
                     <IonItem
+                        lines="none"
                         color="tertiary"
-                        lines="full"
                         className={classes.item}
                     >
                         <IonInput
-                            placeholder="Evening"
+                            counter
                             value={evening}
                             onIonInput={(e) =>
                                 setEvening(e.target.value as string)
                             }
                             maxlength={30}
+                            label="Evening"
+                            labelPlacement="floating"
+                            clearInput
                         />
                     </IonItem>
                 </IonList>

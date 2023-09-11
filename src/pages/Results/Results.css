@@ -14,3 +14,7 @@
   ion-content {
     --background: transparent;
   }
+
+  .counter {
+    padding-right: calc(var(--ion-padding, 16px) * 0.5);
+  }
