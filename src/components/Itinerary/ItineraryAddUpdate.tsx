@@ -19,7 +19,7 @@ interface ItineraryAddUpdateProps {
 
 const useStyles = createUseStyles({
     modal: {
-        "--width": "75%",
+        "--width": "70%",
         "--height": "fit-content",
         "--background": "var(--ion-color-tertiary)",
         "--border-radius": "16px",
@@ -99,7 +99,7 @@ const ItineraryAddUpdate: React.FC<ItineraryAddUpdateProps> = ({
         >
             <div className="ion-text-center ion-margin-top">
                 <IonText>{index ? "Add Day" : "Update Day"}</IonText>
-                <IonList>
+                <IonList className="ion-no-padding">
                     <IonItem
                         lines="none"
                         color="tertiary"
@@ -111,7 +111,7 @@ const ItineraryAddUpdate: React.FC<ItineraryAddUpdateProps> = ({
                             onIonInput={(e) =>
                                 setMorning(e.target.value as string)
                             }
-                            maxlength={30}
+                            maxlength={25}
                             label="Morning"
                             labelPlacement="floating"
                             clearInput
@@ -128,7 +128,7 @@ const ItineraryAddUpdate: React.FC<ItineraryAddUpdateProps> = ({
                             onIonInput={(e) =>
                                 setAfternoon(e.target.value as string)
                             }
-                            maxlength={30}
+                            maxlength={25}
                             label="Afternoon"
                             labelPlacement="floating"
                             clearInput
@@ -145,7 +145,7 @@ const ItineraryAddUpdate: React.FC<ItineraryAddUpdateProps> = ({
                             onIonInput={(e) =>
                                 setEvening(e.target.value as string)
                             }
-                            maxlength={30}
+                            maxlength={25}
                             label="Evening"
                             labelPlacement="floating"
                             clearInput

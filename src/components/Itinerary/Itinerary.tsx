@@ -13,7 +13,7 @@ import {
     IonToolbar,
 } from "@ionic/react";
 import { colorWand } from "ionicons/icons";
-import React, { useRef, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import ItineraryAddCard from "./ItineraryAddCard";
 import ItineraryCard from "./ItineraryCard";
 
@@ -35,6 +35,18 @@ const Itinerary: React.FC<ItineraryProps> = ({ isOpen, toggleModal }) => {
 
     const [moveEnabled, setMoveEnabled] = useState(false);
 
+    // Load itineraryDays data from local storage when the component mounts
+    useEffect(() => {
+        const savedDays = localStorage.getItem("itineraryDays");
+        if (savedDays) {
+            setDays(JSON.parse(savedDays));
+        }
+    }, []);
+
+    const saveToLocalStorage = (data: ItineraryDay[]) => {
+        localStorage.setItem("itineraryDays", JSON.stringify(data));
+    };
+
     const addUpdateDay = (day: ItineraryDay) => {
         const updatedDays = [...days];
         const index = updatedDays.findIndex((d) => d.id === day.id);
@@ -44,6 +56,7 @@ const Itinerary: React.FC<ItineraryProps> = ({ isOpen, toggleModal }) => {
             if (index !== -1) {
                 updatedDays.splice(index, 1);
                 setDays(updatedDays);
+                saveToLocalStorage(updatedDays)
             }
         } else {
             if (index === -1) {
@@ -52,6 +65,7 @@ const Itinerary: React.FC<ItineraryProps> = ({ isOpen, toggleModal }) => {
                 updatedDays[index] = day;
             }
             setDays(updatedDays);
+            saveToLocalStorage(updatedDays)
         }
     };
 
@@ -59,6 +73,7 @@ const Itinerary: React.FC<ItineraryProps> = ({ isOpen, toggleModal }) => {
         const updatedDays = event.detail.complete(days);
 
         setDays(updatedDays);
+        saveToLocalStorage(updatedDays)
     };
 
     return (
@@ -76,7 +91,7 @@ const Itinerary: React.FC<ItineraryProps> = ({ isOpen, toggleModal }) => {
                             onIonChange={() => setMoveEnabled(!moveEnabled)}
                         />
                     </IonButtons>
-                    <IonTitle>
+                    <IonTitle className="ion-text-center">
                         <IonText>Itinerary</IonText>
                     </IonTitle>
                     <IonButtons slot="end">
