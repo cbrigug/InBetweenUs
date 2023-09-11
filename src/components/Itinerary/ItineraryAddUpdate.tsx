@@ -54,7 +54,7 @@ const ItineraryAddUpdate: React.FC<ItineraryAddUpdateProps> = ({
 
     const handleAddUpdate = () => {
         const day: ItineraryDay = {
-            index: index || data?.index || 0,
+            id: index || (data?.id as number),
             morning,
             afternoon,
             evening,
@@ -95,10 +95,10 @@ const ItineraryAddUpdate: React.FC<ItineraryAddUpdateProps> = ({
         <IonModal
             ref={modalRef}
             className={classes.modal}
-            trigger={index ? "present-alert" : `present-alert-${data?.index}`}
+            trigger={index ? "present-alert" : `present-alert-${data?.id}`}
         >
             <div className="ion-text-center ion-margin-top">
-                <IonText>{index ? `Add Day` : `Day ${data?.index}`}</IonText>
+                <IonText>{index ? "Add Day" : "Update Day"}</IonText>
                 <IonList>
                     <IonItem
                         lines="none"
