@@ -18,3 +18,11 @@
   .counter {
     padding-right: calc(var(--ion-padding, 16px) * 0.5);
   }
+
+  ion-toggle::part(handle) {
+    background: url("../../assets/images/up-down-left-right-solid.svg");
+    background-repeat: no-repeat;
+    background-size: 70%;
+    background-color: white;
+    background-position: center;
+  }
