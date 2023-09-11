@@ -1,68 +1,169 @@
-import { IonAlert } from "@ionic/react";
-import React from "react";
+import {
+    IonCol,
+    IonInput,
+    IonItem,
+    IonList,
+    IonModal,
+    IonRow,
+    IonText,
+} from "@ionic/react";
+import React, { useEffect, useRef, useState } from "react";
 import { ItineraryDay } from "./Itinerary";
+import { createUseStyles } from "react-jss";
 
 interface ItineraryAddUpdateProps {
     addUpdateDay: (day: ItineraryDay) => void;
-    index?: number; // need for ItineraryAddCard
+    index?: number; // need for ItineraryAddCard, if index is present, we are adding a new day
     data?: ItineraryDay; // need for ItineraryCard
 }
+
+const useStyles = createUseStyles({
+    modal: {
+        "--width": "72%",
+        "--height": "fit-content",
+        "--background": "var(--ion-color-tertiary)",
+        "--border-radius": "16px",
+    },
+    item: {
+        "--inner-padding-start": "0px",
+        "--inner-padding-end": "0px",
+    },
+    btnRow: {
+        marginTop: "calc(var(--ion-margin, 16px) * .5)",
+        marginBottom: "calc(var(--ion-margin, 16px) * .5)",
+    },
+    btnText: {
+        fontSize: "1.2rem",
+    },
+});
 
 const ItineraryAddUpdate: React.FC<ItineraryAddUpdateProps> = ({
     addUpdateDay,
     index,
     data,
 }) => {
+    const classes = useStyles();
+
+    const modalRef = useRef<HTMLIonModalElement>(null);
+
+    const [morning, setMorning] = useState(data?.morning || "");
+    const [afternoon, setAfternoon] = useState(data?.afternoon || "");
+    const [evening, setEvening] = useState(data?.evening || "");
+
+    const [showDeleteBtn, setShowDeleteBtn] = useState(false);
+
+    const handleAddUpdate = () => {
+        const day: ItineraryDay = {
+            index: index || data?.index || 0,
+            morning,
+            afternoon,
+            evening,
+        };
+
+        addUpdateDay(day);
+        if (index) {
+            dismiss();
+        } else {
+            modalRef.current?.dismiss();
+        }
+    };
+
+    const dismiss = () => {
+        if (index) {
+            setMorning("");
+            setAfternoon("");
+            setEvening("");
+        } else {
+            setMorning(data?.morning || "");
+            setAfternoon(data?.afternoon || "");
+            setEvening(data?.evening || "");
+        }
+
+        modalRef.current?.dismiss();
+    };
+
+    useEffect(() => {
+        // if we are updating a day and all fields are empty, show the delete button
+        if (data && !morning && !afternoon && !evening) {
+            setShowDeleteBtn(true);
+        } else {
+            setShowDeleteBtn(false);
+        }
+    }, [morning, afternoon, evening]);
+
     return (
-        <IonAlert
-            animated
+        <IonModal
+            ref={modalRef}
+            className={classes.modal}
             trigger={index ? "present-alert" : `present-alert-${data?.index}`}
-            header={index ? "Add Day" : `Day ${data?.index}`}
-            buttons={[
-                {
-                    text: "Cancel",
-                    role: "cancel",
-                },
-                {
-                    text: index ? "Add" : "Update",
-                    handler: (val) => {
-                        addUpdateDay({
-                            index: index ? index : data?.index,
-                            ...val,
-                        });
-                    },
-                },
-            ]}
-            inputs={[
-                {
-                    name: "morning",
-                    type: "text",
-                    placeholder: "Morning",
-                    attributes: {
-                        maxLength: 30,
-                    },
-                    value: data?.morning,
-                },
-                {
-                    name: "afternoon",
-                    type: "text",
-                    placeholder: "Afternoon",
-                    attributes: {
-                        maxLength: 30,
-                    },
-                    value: data?.afternoon,
-                },
-                {
-                    name: "evening",
-                    type: "text",
-                    placeholder: "Evening",
-                    attributes: {
-                        maxLength: 30,
-                    },
-                    value: data?.evening,
-                },
-            ]}
-        />
+        >
+            <div className="ion-text-center ion-margin-top">
+                <IonText>{index ? `Add Day` : `Day ${data?.index}`}</IonText>
+                <IonList>
+                    <IonItem
+                        lines="none"
+                        color="tertiary"
+                        className={classes.item}
+                    >
+                        <IonInput
+                            placeholder="Morning"
+                            value={morning}
+                            onIonInput={(e) =>
+                                setMorning(e.target.value as string)
+                            }
+                            maxlength={30}
+                        />
+                    </IonItem>
+                    <IonItem
+                        lines="none"
+                        color="tertiary"
+                        className={classes.item}
+                    >
+                        <IonInput
+                            placeholder="Afternoon"
+                            value={afternoon}
+                            onIonInput={(e) =>
+                                setAfternoon(e.target.value as string)
+                            }
+                            maxlength={30}
+                        />
+                    </IonItem>
+                    <IonItem
+                        color="tertiary"
+                        lines="full"
+                        className={classes.item}
+                    >
+                        <IonInput
+                            placeholder="Evening"
+                            value={evening}
+                            onIonInput={(e) =>
+                                setEvening(e.target.value as string)
+                            }
+                            maxlength={30}
+                        />
+                    </IonItem>
+                </IonList>
+                <IonRow className={classes.btnRow}>
+                    <IonCol onClick={dismiss}>
+                        <IonText className={classes.btnText} color="secondary">
+                            Cancel
+                        </IonText>
+                    </IonCol>
+                    <IonCol onClick={handleAddUpdate}>
+                        <IonText
+                            className={classes.btnText}
+                            color={showDeleteBtn ? "danger" : "primary"}
+                        >
+                            {index
+                                ? "Add"
+                                : showDeleteBtn
+                                ? "Delete"
+                                : "Update"}
+                        </IonText>
+                    </IonCol>
+                </IonRow>
+            </div>
+        </IonModal>
     );
 };
 
