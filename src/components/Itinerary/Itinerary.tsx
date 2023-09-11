@@ -40,8 +40,11 @@ const Itinerary: React.FC<ItineraryProps> = ({ isOpen, toggleModal }) => {
         const index = updatedDays.findIndex((d) => d.id === day.id);
 
         if (!day.morning && !day.afternoon && !day.evening) {
-            updatedDays.splice(index, 1);
-            setDays(updatedDays);
+            // we only want to delete an index if it's found
+            if (index !== -1) {
+                updatedDays.splice(index, 1);
+                setDays(updatedDays);
+            }
         } else {
             if (index === -1) {
                 updatedDays.push(day);
