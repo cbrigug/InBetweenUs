@@ -353,7 +353,7 @@ const Results: React.FC = () => {
                             drivingTimeB={curCity?.drivingTimeB}
                         />
 
-                        <ThingsToDoSection coords={curCity?.position} />
+                        <ThingsToDoSection cityName={curCity?.title} coords={curCity?.position} />
 
                         <NearbyCitiesSection
                             personA={personA}
@@ -369,7 +369,7 @@ const Results: React.FC = () => {
                     <NoResultsFound />
                 )}
                 <IonLoading isOpen={isLoading} />
-                <Itinerary isOpen={isModalOpen} toggleModal={toggleModal} />
+                <Itinerary cityName={curCity.title} isOpen={isModalOpen} toggleModal={toggleModal} />
             </IonContent>
         </IonPage>
     );

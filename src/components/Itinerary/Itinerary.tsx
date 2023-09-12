@@ -1,9 +1,10 @@
 import {
+    IonAlert,
     IonButton,
     IonButtons,
     IonContent,
     IonHeader,
-    IonIcon,
+    IonLoading,
     IonModal,
     IonReorder,
     IonReorderGroup,
@@ -12,12 +13,17 @@ import {
     IonToggle,
     IonToolbar,
 } from "@ionic/react";
-import { colorWand } from "ionicons/icons";
 import React, { useEffect, useRef, useState } from "react";
 import ItineraryAddCard from "./ItineraryAddCard";
 import ItineraryCard from "./ItineraryCard";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faWandMagicSparkles } from "@fortawesome/free-solid-svg-icons";
+
+import OpenAI from "openai";
+import { environment } from "../../../environment.dev";
 
 interface ItineraryProps {
+    cityName: string;
     isOpen: boolean;
     toggleModal: () => void;
 }
@@ -42,13 +48,26 @@ export const saveToLocalStorage = (data: ItineraryDay[]) => {
     localStorage.setItem("itineraryDays", JSON.stringify(data));
 };
 
-const Itinerary: React.FC<ItineraryProps> = ({ isOpen, toggleModal }) => {
+const openAi = new OpenAI({
+    apiKey: environment.REACT_APP_OPENAI_API_KEY,
+    dangerouslyAllowBrowser: true,
+});
+
+const Itinerary: React.FC<ItineraryProps> = ({
+    isOpen,
+    toggleModal,
+    cityName,
+}) => {
     const modalRef = useRef<HTMLIonModalElement>(null);
     const [days, setDays] = useState<ItineraryDay[]>(
         getItineraryFromLocalStorage()
     );
 
     const [moveEnabled, setMoveEnabled] = useState(false);
+
+    // Generate itinerary with AI
+    const [numDays, setNumDays] = useState<number>();
+    const [isLoading, setIsLoading] = useState(false);
 
     const addUpdateDay = (day: ItineraryDay) => {
         const updatedDays = [...days];
@@ -79,6 +98,49 @@ const Itinerary: React.FC<ItineraryProps> = ({ isOpen, toggleModal }) => {
         saveToLocalStorage(updatedDays);
     };
 
+    const generateItinerary = async (numDays: number) => {
+        setIsLoading(true);
+        const content = `
+            Give me ${numDays} days of things to do in ${cityName}.
+            Return the result as a JSON array of objects like this:
+            [{morning: "ActivityType | location", afternoon: "ActivityType | location", evening: "ActivityType | location"}]:
+            the string "ActivityType | location" should be 25 chars or less as a whole.
+            "location" should be specific unless it's a place to eat,
+            then restrict it to the style of cuisine they serve. Use abbreviations
+            when you can because we are limiting to 25 chars.
+        `;
+
+        try {
+            // make request to openai
+            const completion = await openAi.chat.completions.create({
+                messages: [{ role: "user", content: content }],
+                model: "gpt-3.5-turbo",
+            });
+
+            const results = JSON.parse(
+                completion.choices[0].message.content as string
+            );
+
+            const resultsAsItineraryItem = results.map(
+                (day: ItineraryDay, i: number) => {
+                    return {
+                        id: i + 1,
+                        morning: day.morning,
+                        afternoon: day.afternoon,
+                        evening: day.evening,
+                    };
+                }
+            );
+
+            setDays(resultsAsItineraryItem);
+            saveToLocalStorage(resultsAsItineraryItem);
+            setIsLoading(false);
+        } catch (error) {
+            console.error(error);
+            setIsLoading(false);
+        }
+    };
+
     useEffect(() => {
         if (isOpen) {
             setDays(getItineraryFromLocalStorage());
@@ -104,12 +166,11 @@ const Itinerary: React.FC<ItineraryProps> = ({ isOpen, toggleModal }) => {
                         <IonText>Itinerary</IonText>
                     </IonTitle>
                     <IonButtons slot="end">
-                        <IonButton onClick={toggleModal}>
-                            <IonIcon
-                                slot="icon-only"
-                                icon={colorWand}
-                                size="large"
-                                color="dark"
+                        <IonButton id="reset-itinerary">
+                            <FontAwesomeIcon
+                                icon={faWandMagicSparkles}
+                                size="xl"
+                                color="black"
                             />
                         </IonButton>
                     </IonButtons>
@@ -138,6 +199,39 @@ const Itinerary: React.FC<ItineraryProps> = ({ isOpen, toggleModal }) => {
                         </IonReorder>
                     ))}
                 </IonReorderGroup>
+                <IonAlert
+                    header="Generate Itinerary with AI"
+                    subHeader="Warning: This will reset your itinerary."
+                    trigger="reset-itinerary"
+                    buttons={[
+                        {
+                            text: "Cancel",
+                            role: "cancel",
+                        },
+                        {
+                            text: "Confirm",
+                            role: "confirm",
+                            handler: (data) => {
+                                const days = data.numDays;
+
+                                if (days > 7 || days < 1) {
+                                    return false;
+                                } else {
+                                    generateItinerary(days);
+                                }
+                            },
+                        },
+                    ]}
+                    inputs={[
+                        {
+                            name: "numDays",
+                            type: "number",
+                            placeholder: "Number of days (max: 7)",
+                            value: numDays,
+                        },
+                    ]}
+                ></IonAlert>
+                <IonLoading isOpen={isLoading} />
             </IonContent>
         </IonModal>
     );

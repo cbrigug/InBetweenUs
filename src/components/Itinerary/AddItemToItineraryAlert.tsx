@@ -106,9 +106,6 @@ const AddItemToItineraryAlert: React.FC<AddItemToItineraryAlertProps> = ({
     };
 
     const handleAdd = () => {
-        // take first 25 characters of activity to fit requirements
-        activity = activity.substring(0, 25);
-
         const day: ItineraryDay = {
             id: curDay.id,
             morning: timeOfDay === "morning" ? activity : curDay.morning,

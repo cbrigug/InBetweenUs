@@ -19,14 +19,13 @@ interface ItineraryAddUpdateProps {
 
 const useStyles = createUseStyles({
     modal: {
-        "--width": "70%",
+        "--width": "75%",
         "--height": "fit-content",
         "--background": "var(--ion-color-tertiary)",
         "--border-radius": "16px",
     },
     item: {
         "--inner-padding-start": "0px",
-        "--inner-padding-end": "0px",
     },
     btnRow: {
         marginTop: "calc(var(--ion-margin, 16px) * .5)",
@@ -111,7 +110,6 @@ const ItineraryAddUpdate: React.FC<ItineraryAddUpdateProps> = ({
                             onIonInput={(e) =>
                                 setMorning(e.target.value as string)
                             }
-                            maxlength={25}
                             label="Morning"
                             labelPlacement="floating"
                             clearInput
@@ -128,7 +126,6 @@ const ItineraryAddUpdate: React.FC<ItineraryAddUpdateProps> = ({
                             onIonInput={(e) =>
                                 setAfternoon(e.target.value as string)
                             }
-                            maxlength={25}
                             label="Afternoon"
                             labelPlacement="floating"
                             clearInput
@@ -145,7 +142,6 @@ const ItineraryAddUpdate: React.FC<ItineraryAddUpdateProps> = ({
                             onIonInput={(e) =>
                                 setEvening(e.target.value as string)
                             }
-                            maxlength={25}
                             label="Evening"
                             labelPlacement="floating"
                             clearInput

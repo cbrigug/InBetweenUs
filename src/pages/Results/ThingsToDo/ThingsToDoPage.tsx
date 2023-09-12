@@ -32,6 +32,7 @@ import Itinerary from "../../../components/Itinerary/Itinerary";
 import AddItemToItineraryAlert from "../../../components/Itinerary/AddItemToItineraryAlert";
 
 interface ThingsToDoProps {
+    cityName: string;
     coords: ShortCoords;
 }
 
@@ -61,6 +62,9 @@ const ThingsToDoPage: React.FC = () => {
     const [thingsToDo, setThingsToDo] = useState<any[]>([]);
     const [coords, setCoords] = useState<ShortCoords>(
         (location.state as ThingsToDoProps)?.coords ?? {}
+    );
+    const [cityName, setCityName] = useState<string>(
+        (location.state as ThingsToDoProps).cityName
     );
 
     const [search, setSearch] = useState("");
@@ -251,6 +255,7 @@ const ThingsToDoPage: React.FC = () => {
                     />
                 </IonModal>
                 <Itinerary
+                    cityName={cityName}
                     isOpen={isItineraryOpen}
                     toggleModal={toggleItineraryModal}
                 />

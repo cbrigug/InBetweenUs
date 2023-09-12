@@ -19,6 +19,7 @@ import MoreThingsToDoCard from "./MoreThingsToDoCard";
 import { useHistory } from "react-router";
 
 interface ThingsToDoSectionProps {
+    cityName: string;
     coords: ShortCoords;
 }
 
@@ -236,13 +237,17 @@ const mockData = [
 const OPENTRIPMAP_API_KEY = environment.REACT_APP_OPENTRIPMAP_API_KEY;
 const RADIUS = 24140.2; // 15 miles in meters
 
-const ThingsToDoSection: React.FC<ThingsToDoSectionProps> = ({ coords }) => {
+const ThingsToDoSection: React.FC<ThingsToDoSectionProps> = ({
+    coords,
+    cityName,
+}) => {
     const [thingsToDo, setThingsToDo] = useState<any[]>(mockData);
 
     const history = useHistory();
 
     const navToThingsToDo = () => {
         history.push("/things-to-do", {
+            cityName,
             coords,
         });
     };

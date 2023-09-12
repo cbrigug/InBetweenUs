@@ -22,6 +22,12 @@ const useStyles = createUseStyles({
     },
     text: {
         fontSize: "1rem",
+        overflowX: "scroll",
+        whiteSpace: "nowrap",
+        // hide scrollbar
+        "&::-webkit-scrollbar": {
+            display: "none",
+        },
     },
     textRow: {
         marginTop: "calc(var(--ion-margin, 16px) * .25)",
