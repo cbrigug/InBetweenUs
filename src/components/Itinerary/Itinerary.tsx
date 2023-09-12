@@ -29,23 +29,26 @@ export interface ItineraryDay {
     evening: string;
 }
 
+export const getItineraryFromLocalStorage = (): ItineraryDay[] => {
+    const savedDays = localStorage.getItem("itineraryDays");
+    if (savedDays) {
+        return JSON.parse(savedDays);
+    } else {
+        return [];
+    }
+};
+
+export const saveToLocalStorage = (data: ItineraryDay[]) => {
+    localStorage.setItem("itineraryDays", JSON.stringify(data));
+};
+
 const Itinerary: React.FC<ItineraryProps> = ({ isOpen, toggleModal }) => {
     const modalRef = useRef<HTMLIonModalElement>(null);
-    const [days, setDays] = useState<ItineraryDay[]>([]);
+    const [days, setDays] = useState<ItineraryDay[]>(
+        getItineraryFromLocalStorage()
+    );
 
     const [moveEnabled, setMoveEnabled] = useState(false);
-
-    // Load itineraryDays data from local storage when the component mounts
-    useEffect(() => {
-        const savedDays = localStorage.getItem("itineraryDays");
-        if (savedDays) {
-            setDays(JSON.parse(savedDays));
-        }
-    }, []);
-
-    const saveToLocalStorage = (data: ItineraryDay[]) => {
-        localStorage.setItem("itineraryDays", JSON.stringify(data));
-    };
 
     const addUpdateDay = (day: ItineraryDay) => {
         const updatedDays = [...days];
@@ -56,7 +59,7 @@ const Itinerary: React.FC<ItineraryProps> = ({ isOpen, toggleModal }) => {
             if (index !== -1) {
                 updatedDays.splice(index, 1);
                 setDays(updatedDays);
-                saveToLocalStorage(updatedDays)
+                saveToLocalStorage(updatedDays);
             }
         } else {
             if (index === -1) {
@@ -65,7 +68,7 @@ const Itinerary: React.FC<ItineraryProps> = ({ isOpen, toggleModal }) => {
                 updatedDays[index] = day;
             }
             setDays(updatedDays);
-            saveToLocalStorage(updatedDays)
+            saveToLocalStorage(updatedDays);
         }
     };
 
@@ -73,8 +76,14 @@ const Itinerary: React.FC<ItineraryProps> = ({ isOpen, toggleModal }) => {
         const updatedDays = event.detail.complete(days);
 
         setDays(updatedDays);
-        saveToLocalStorage(updatedDays)
+        saveToLocalStorage(updatedDays);
     };
+
+    useEffect(() => {
+        if (isOpen) {
+            setDays(getItineraryFromLocalStorage());
+        }
+    }, [isOpen]);
 
     return (
         <IonModal

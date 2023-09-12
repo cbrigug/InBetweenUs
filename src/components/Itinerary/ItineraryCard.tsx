@@ -23,6 +23,9 @@ const useStyles = createUseStyles({
     text: {
         fontSize: "1rem",
     },
+    textRow: {
+        marginTop: "calc(var(--ion-margin, 16px) * .25)",
+    },
 });
 
 const ItineraryCard: React.FC<ItineraryCardProps> = ({
@@ -49,12 +52,12 @@ const ItineraryCard: React.FC<ItineraryCardProps> = ({
                                 {day.morning}
                             </IonText>
                         </IonRow>
-                        <IonRow>
+                        <IonRow className={classes.textRow}>
                             <IonText className={classes.text}>
                                 {day.afternoon}
                             </IonText>
                         </IonRow>
-                        <IonRow>
+                        <IonRow className={classes.textRow}>
                             <IonText className={classes.text}>
                                 {day.evening}
                             </IonText>

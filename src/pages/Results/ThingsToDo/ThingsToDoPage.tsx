@@ -28,6 +28,8 @@ import { capitalize } from "../../../utils/stringUtils";
 import ActivityTypeIcon from "../../../components/Results/ThingsToDo/ActivityTypeIcon";
 import { createUseStyles } from "react-jss";
 import FilterModalContent from "../../../components/Results/ThingsToDo/FilterModalContent";
+import Itinerary from "../../../components/Itinerary/Itinerary";
+import AddItemToItineraryAlert from "../../../components/Itinerary/AddItemToItineraryAlert";
 
 interface ThingsToDoProps {
     coords: ShortCoords;
@@ -49,10 +51,6 @@ const ThingsToDoPage: React.FC = () => {
     const location = useLocation();
     const modal = useRef<HTMLIonModalElement>(null);
 
-    const addToItinerary = (activity: string) => {
-        console.log(activity);
-    };
-
     // full list of things to do, should not change
     const [allThingsToDo, setAllThingsToDo] = useState([]);
 
@@ -67,6 +65,22 @@ const ThingsToDoPage: React.FC = () => {
 
     const [search, setSearch] = useState("");
     const [activeFilters, setActiveFilters] = useState<string[]>([]);
+
+    // Itinerary Modal
+    const [isItineraryOpen, setIsItineraryOpen] = useState(false);
+
+    const toggleItineraryModal = () => {
+        setIsItineraryOpen(!isItineraryOpen);
+    };
+
+    // Add Item to Itinerary Alert
+    const [isAlertOpen, setIsAlertOpen] = useState(false);
+    const [activity, setActivity] = useState("");
+
+    const addToItinerary = (activity: string) => {
+        setActivity(activity);
+        setIsAlertOpen(true);
+    };
 
     useEffect(() => {
         setActiveFilters([]);
@@ -158,7 +172,7 @@ const ThingsToDoPage: React.FC = () => {
                         <IonText color={"primary"}>do</IonText>
                     </div>
                     <IonButtons slot="end">
-                        <IonButton>
+                        <IonButton onClick={toggleItineraryModal}>
                             <IonIcon
                                 slot="icon-only"
                                 icon={newspaper}
@@ -236,6 +250,15 @@ const ThingsToDoPage: React.FC = () => {
                         activeFilters={activeFilters}
                     />
                 </IonModal>
+                <Itinerary
+                    isOpen={isItineraryOpen}
+                    toggleModal={toggleItineraryModal}
+                />
+                <AddItemToItineraryAlert
+                    isOpen={isAlertOpen}
+                    setIsOpen={setIsAlertOpen}
+                    activity={activity}
+                />
             </IonContent>
         </IonPage>
     );

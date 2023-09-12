@@ -92,7 +92,7 @@ const ThingsToDoItem: React.FC<ThingsToDoItemProps> = ({
             </IonItemOptions>
 
             <IonItemOptions side="end" onIonSwipe={handleSlideEnd}>
-                <IonItemOption expandable={true}>
+                <IonItemOption expandable={true} onClick={() => addToItinerary(thingToDo.name)}>
                     <IonIcon
                         icon={add}
                         color="light"
