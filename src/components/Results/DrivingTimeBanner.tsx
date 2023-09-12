@@ -42,7 +42,8 @@ const DrivingTimeBanner: React.FC<DrivingTimeBannerProps> = ({
                     <IonRow className="ion-justify-content-center">
                         <Avatar
                             name={personA.name}
-                            size={"64px"}
+                            size={"48px"}
+                            textSize="1.5rem"
                             image={personA.photo ?? undefined}
                         />
                         <IonText color={"secondary"}>
@@ -59,7 +60,8 @@ const DrivingTimeBanner: React.FC<DrivingTimeBannerProps> = ({
                     <IonRow className="ion-justify-content-center">
                         <Avatar
                             name={personB.name}
-                            size={"64px"}
+                            size={"48px"}
+                            textSize="1.5rem"
                             image={personB.photo ?? undefined}
                         />
                         <IonText color={"secondary"}>

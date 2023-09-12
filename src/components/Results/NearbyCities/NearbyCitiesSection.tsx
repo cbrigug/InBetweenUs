@@ -101,8 +101,8 @@ const NearbyCitiesSection: React.FC<NearbyCitiesSectionProps> = ({
             )}
 
             <IonGrid className="ion-no-padding">
-                <IonRow className="ion-margin-top">
-                    <Swiper slidesPerView={2} >
+                <IonRow className="ion-margin-bottom">
+                    <Swiper slidesPerView={2}>
                         {cities.map((city) => (
                             <SwiperSlide key={city.title}>
                                 <CityCard

@@ -3,7 +3,6 @@ import { ShortCoords } from "../../../interfaces/City";
 import {
     IonItem,
     IonText,
-    IonIcon,
     IonGrid,
     IonRow,
     IonCol,
@@ -32,7 +31,11 @@ const PlacesToStaySection: React.FC<PlacesToStaySectionProps> = ({
             </IonItem>
 
             <IonGrid className="ion-no-padding">
-                <IonRow className="ion-margin-top">
+                <IonRow
+                    style={{
+                        marginBottom: "calc(var(--ion-margin, 16px) * 0.25)",
+                    }}
+                >
                     <IonCol size="4">
                         <HotelCard />
                     </IonCol>

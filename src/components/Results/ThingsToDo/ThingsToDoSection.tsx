@@ -293,7 +293,11 @@ const ThingsToDoSection: React.FC<ThingsToDoSectionProps> = ({
             </IonItem>
 
             <IonGrid className="ion-no-padding">
-                <IonRow className="ion-margin-top">
+                <IonRow
+                    style={{
+                        marginBottom: "calc(var(--ion-margin, 16px) * 0.25)",
+                    }}
+                >
                     <Swiper slidesPerView={2}>
                         {thingsToDo.map((thingToDo) => (
                             <SwiperSlide key={thingToDo.xid}>
