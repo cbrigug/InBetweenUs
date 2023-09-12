@@ -29,6 +29,7 @@ import DrivingTimeBanner from "../../components/Results/DrivingTimeBanner";
 import ThingsToDoSection from "../../components/Results/ThingsToDo/ThingsToDoSection";
 import NearbyCitiesSection from "../../components/Results/NearbyCities/NearbyCitiesSection";
 import Itinerary from "../../components/Itinerary/Itinerary";
+import PlacesToStaySection from "../../components/Results/PlacesToStay/PlacesToStaySection";
 
 interface ResultsProps {
     personA: FormDataType;
@@ -353,7 +354,12 @@ const Results: React.FC = () => {
                             drivingTimeB={curCity?.drivingTimeB}
                         />
 
-                        <ThingsToDoSection cityName={curCity?.title} coords={curCity?.position} />
+                        <ThingsToDoSection
+                            cityName={curCity?.title}
+                            coords={curCity?.position}
+                        />
+
+                        <PlacesToStaySection coords={curCity?.position} />
 
                         <NearbyCitiesSection
                             personA={personA}
@@ -369,7 +375,11 @@ const Results: React.FC = () => {
                     <NoResultsFound />
                 )}
                 <IonLoading isOpen={isLoading} />
-                <Itinerary cityName={curCity.title} isOpen={isModalOpen} toggleModal={toggleModal} />
+                <Itinerary
+                    cityName={curCity.title}
+                    isOpen={isModalOpen}
+                    toggleModal={toggleModal}
+                />
             </IonContent>
         </IonPage>
     );
