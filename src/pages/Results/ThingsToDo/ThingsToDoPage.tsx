@@ -64,7 +64,7 @@ const ThingsToDoPage: React.FC = () => {
         (location.state as ThingsToDoProps)?.coords ?? {}
     );
     const [cityName, setCityName] = useState<string>(
-        (location.state as ThingsToDoProps).cityName
+        (location.state as ThingsToDoProps)?.cityName
     );
 
     const [search, setSearch] = useState("");

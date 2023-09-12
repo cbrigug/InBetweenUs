@@ -105,7 +105,6 @@ const ItineraryAddUpdate: React.FC<ItineraryAddUpdateProps> = ({
                         className={classes.item}
                     >
                         <IonInput
-                            counter
                             value={morning}
                             onIonInput={(e) =>
                                 setMorning(e.target.value as string)
@@ -121,7 +120,6 @@ const ItineraryAddUpdate: React.FC<ItineraryAddUpdateProps> = ({
                         className={classes.item}
                     >
                         <IonInput
-                            counter
                             value={afternoon}
                             onIonInput={(e) =>
                                 setAfternoon(e.target.value as string)
@@ -137,7 +135,6 @@ const ItineraryAddUpdate: React.FC<ItineraryAddUpdateProps> = ({
                         className={classes.item}
                     >
                         <IonInput
-                            counter
                             value={evening}
                             onIonInput={(e) =>
                                 setEvening(e.target.value as string)

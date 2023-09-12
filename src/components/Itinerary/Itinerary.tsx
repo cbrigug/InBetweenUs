@@ -12,6 +12,7 @@ import {
     IonTitle,
     IonToggle,
     IonToolbar,
+    useIonToast,
 } from "@ionic/react";
 import React, { useEffect, useRef, useState } from "react";
 import ItineraryAddCard from "./ItineraryAddCard";
@@ -68,6 +69,16 @@ const Itinerary: React.FC<ItineraryProps> = ({
     // Generate itinerary with AI
     const [numDays, setNumDays] = useState<number>();
     const [isLoading, setIsLoading] = useState(false);
+
+    const [present] = useIonToast();
+    const presentToast = (position: "top" | "middle" | "bottom") => {
+        present({
+            message: "Error occurred. Please try again.",
+            duration: 1000,
+            color: "danger",
+            position: position,
+        });
+    };
 
     const addUpdateDay = (day: ItineraryDay) => {
         const updatedDays = [...days];
@@ -137,6 +148,7 @@ const Itinerary: React.FC<ItineraryProps> = ({
             setIsLoading(false);
         } catch (error) {
             console.error(error);
+            presentToast("bottom");
             setIsLoading(false);
         }
     };
