@@ -1,10 +1,11 @@
 import React from 'react';
+import PlaceToStayCard from './PlaceToStayCard';
 
 interface CheapestStayCardProps {}
 
 const CheapestStayCard: React.FC<CheapestStayCardProps> = ({}) => {
   return (
-    <div>Cheapest</div>
+    <PlaceToStayCard type='cheapest' />
   );
 }
 
