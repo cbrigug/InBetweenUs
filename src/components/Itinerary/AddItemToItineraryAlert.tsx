@@ -1,4 +1,5 @@
 import {
+    IonButton,
     IonCol,
     IonContent,
     IonIcon,
@@ -18,7 +19,7 @@ import {
     calendarOutline,
     chevronDown,
 } from "ionicons/icons";
-import React, { useRef, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { createUseStyles } from "react-jss";
 import {
     ItineraryDay,
@@ -77,6 +78,16 @@ const AddItemToItineraryAlert: React.FC<AddItemToItineraryAlertProps> = ({
         getItineraryFromLocalStorage().concat(fillerDay)
     );
     const [curDay, setCurDay] = useState<ItineraryDay>(days[0]);
+
+    // pull from storage when modal is opened
+    useEffect(() => {
+        if (isOpen) {
+            const updatedDays = getItineraryFromLocalStorage().concat(fillerDay);
+
+            setDays(updatedDays);
+            setCurDay(updatedDays[0]);
+        }
+    }, [isOpen]);
 
     // Alert fields
     const [timeOfDay, setTimeOfDay] = useState(""); // ["morning", "afternoon", "evening"]
@@ -220,15 +231,36 @@ const AddItemToItineraryAlert: React.FC<AddItemToItineraryAlertProps> = ({
             </IonRadioGroup>
             <div className="ion-text-center">
                 <IonRow className={classes.btnRow}>
-                    <IonCol onClick={() => setIsOpen(false)}>
-                        <IonText className={classes.btnText} color="secondary">
-                            Cancel
-                        </IonText>
+                    <IonCol>
+                        <IonButton
+                            color="tertiary"
+                            className="ion-no-margin"
+                            size="small"
+                            onClick={() => setIsOpen(false)}
+                        >
+                            <IonText
+                                className={classes.btnText}
+                                color="secondary"
+                            >
+                                Cancel
+                            </IonText>
+                        </IonButton>
                     </IonCol>
-                    <IonCol onClick={handleAdd}>
-                        <IonText className={classes.btnText} color="primary">
-                            Add
-                        </IonText>
+                    <IonCol>
+                        <IonButton
+                            color="tertiary"
+                            disabled={!timeOfDay}
+                            className="ion-no-margin"
+                            size="small"
+                            onClick={handleAdd}
+                        >
+                            <IonText
+                                className={classes.btnText}
+                                color="primary"
+                            >
+                                Add
+                            </IonText>
+                        </IonButton>
                     </IonCol>
                 </IonRow>
             </div>
