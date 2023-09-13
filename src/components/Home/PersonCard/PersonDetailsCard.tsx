@@ -98,7 +98,7 @@ const PersonDetailsCard: React.FC<PersonDetailsCardProps> = ({
                 toggleModal={modal.toggleModal}
                 confirm={modal.confirm}
                 modal={modal.modal}
-                isDetails={modal.isDetails}
+                type={"edit"}
                 formData={formData}
             />
         </>

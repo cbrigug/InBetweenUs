@@ -27,6 +27,7 @@ import { environment } from "../../../../environment.dev";
 import { Geolocation } from "@capacitor/geolocation";
 import { CapacitorHttp } from "@capacitor/core";
 import { Coordinates } from "../../../utils/distanceUtils";
+import { capitalize } from "../../../utils/stringUtils";
 
 export type FormDataType = {
     name: string;
@@ -44,7 +45,7 @@ export interface PersonModalProps {
     toggleModal: () => void;
     confirm: (formData: FormDataType) => void;
     modal: React.RefObject<HTMLIonModalElement>;
-    isDetails: boolean;
+    type: "add" | "edit" | "profile";
     formData?: FormDataType;
 }
 
@@ -64,7 +65,7 @@ const PersonModal: React.FC<PersonModalProps> = ({
     toggleModal,
     confirm,
     modal,
-    isDetails,
+    type,
     formData,
 }) => {
     const [contact, setContact] = useState<ContactPayload | null>(null);
@@ -298,27 +299,46 @@ const PersonModal: React.FC<PersonModalProps> = ({
         }
     }, [contact]);
 
+    // this is mainly for the profile modal
+    // load form data instantly if it exists
+    useEffect(() => {
+        if (formData) {
+            setPhoto(formData.photo ?? null);
+            setName(formData.name);
+            setAddress(formData.address);
+            setCity(formData.city);
+            setState(formData.state);
+            setZipCode(formData.zipCode);
+            setCountry(formData.country);
+        }
+    }, [formData]);
+
     return (
         <IonModal isOpen={isModalOpen} onDidDismiss={toggleModal} ref={modal}>
             <IonHeader>
                 <IonToolbar>
                     <IonButtons slot="start">
                         <IonButton onClick={handleCancel}>
-                            <IonText color="dark" style={{fontSize: "1.2rem"}}>Cancel</IonText>
+                            <IonText
+                                color="dark"
+                                style={{ fontSize: "1.2rem" }}
+                            >
+                                Cancel
+                            </IonText>
                         </IonButton>
                     </IonButtons>
                     <IonTitle className="ion-text-center">
-                        <IonText color={"primary"}>
-                            {isDetails ? "Edit" : "Add"}
+                        <IonText color={type !== "profile" ? "primary" : ""}>
+                            {capitalize(type)}
                         </IonText>
-                        <IonText>&nbsp;Person</IonText>
+                        {type !== "profile" && <IonText>&nbsp;Person</IonText>}
                     </IonTitle>
                     <IonButtons slot="end">
                         <IonButton
                             onClick={handleConfirm}
                             disabled={!isFormValid}
                         >
-                            <IonText style={{fontSize: "1.2rem"}}>
+                            <IonText style={{ fontSize: "1.2rem" }}>
                                 Confirm
                             </IonText>
                         </IonButton>

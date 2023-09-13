@@ -74,7 +74,7 @@ const AddPersonCard: React.FC<AddPersonCardProps> = ({ isPersonA, modal }) => {
                 toggleModal={modal.toggleModal}
                 confirm={modal.confirm}
                 modal={modal.modal}
-                isDetails={modal.isDetails}
+                type={"add"}
             />
         </>
     );

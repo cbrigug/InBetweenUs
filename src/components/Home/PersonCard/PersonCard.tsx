@@ -20,7 +20,7 @@ const PersonCard: React.FC<PersonCardProps> = ({ isPersonA, setPerson }) => {
     const confirmModal = async (formData: FormDataType) => {
         await modal.current?.dismiss();
         setFormData(formData);
-        setPerson(formData)
+        setPerson(formData);
     };
 
     const modalObj: PersonModalProps = {
@@ -28,7 +28,7 @@ const PersonCard: React.FC<PersonCardProps> = ({ isPersonA, setPerson }) => {
         toggleModal: toggleModal,
         confirm: confirmModal,
         modal: modal,
-        isDetails: !!formData,
+        type: "add",
     };
 
     return formData ? (
@@ -38,7 +38,10 @@ const PersonCard: React.FC<PersonCardProps> = ({ isPersonA, setPerson }) => {
             modal={modalObj}
         />
     ) : (
-        <AddPersonCard isPersonA={isPersonA} modal={modalObj} />
+        <AddPersonCard
+            isPersonA={isPersonA}
+            modal={{ ...modalObj, type: "edit" }}
+        />
     );
 };
 

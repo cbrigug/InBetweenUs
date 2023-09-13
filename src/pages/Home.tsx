@@ -9,13 +9,17 @@ import {
     IonText,
     IonButton,
 } from "@ionic/react";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useHistory } from "react-router-dom";
 import React from "react";
 import PersonCard from "../components/Home/PersonCard/PersonCard";
-import { FormDataType } from "../components/Home/PersonCard/PersonModal";
+import PersonModal, {
+    FormDataType,
+} from "../components/Home/PersonCard/PersonModal";
 import PulsingCircle from "../components/Home/PulsingCircle";
 import { personCircle } from "ionicons/icons";
+import ProfileModal from "../components/Home/PersonCard/ProfileModal";
+import Avatar from "../components/Avatar";
 
 const defaultFormData: FormDataType = {
     name: "",
@@ -51,6 +55,21 @@ const Home: React.FC = () => {
         }
     };
 
+    // profile modal
+    const [profile, setProfile] = useState<FormDataType | undefined>();
+
+    const [isModalOpen, setIsModalOpen] = useState(false);
+    const toggleModal = () => {
+        setIsModalOpen(!isModalOpen);
+    };
+
+    useEffect(() => {
+        const profile = localStorage.getItem("profile");
+        if (profile) {
+            setProfile(JSON.parse(profile));
+        }
+    }, [isModalOpen]);
+
     return (
         <IonPage>
             <IonHeader className="ion-no-border">
@@ -64,12 +83,21 @@ const Home: React.FC = () => {
                     </IonText>
                     <IonText color={"primary"}>Us</IonText>
                     <IonButtons slot="end">
-                        <IonButton>
-                            <IonIcon
-                                slot="icon-only"
-                                icon={personCircle}
-                                color="dark"
-                            />
+                        <IonButton onClick={toggleModal}>
+                            {profile ? (
+                                <Avatar
+                                    name={profile.name}
+                                    size="32px"
+                                    image={profile.photo ?? undefined}
+                                    textSize="1rem"
+                                />
+                            ) : (
+                                <IonIcon
+                                    slot="icon-only"
+                                    icon={personCircle}
+                                    color="dark"
+                                />
+                            )}
                         </IonButton>
                     </IonButtons>
                 </IonToolbar>
@@ -92,6 +120,10 @@ const Home: React.FC = () => {
                         }
                     />
                 </IonGrid>
+                <ProfileModal
+                    isModalOpen={isModalOpen}
+                    toggleModal={toggleModal}
+                />
             </IonContent>
         </IonPage>
     );
