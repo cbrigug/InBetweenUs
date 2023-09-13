@@ -1,14 +1,5 @@
 import { Redirect, Route } from "react-router-dom";
-import {
-  IonApp,
-  IonIcon,
-  IonLabel,
-  IonRouterOutlet,
-  IonTabBar,
-  IonTabButton,
-  IonTabs,
-  setupIonicReact,
-} from "@ionic/react";
+import { IonApp, IonRouterOutlet, setupIonicReact } from "@ionic/react";
 import { IonReactRouter } from "@ionic/react-router";
 import Home from "./pages/Home";
 
@@ -36,37 +27,51 @@ import ThingsToDoPage from "./pages/Results/ThingsToDo/ThingsToDoPage";
 import NearbyCitiesPage from "./pages/Results/NearbyCities/NearbyCitiesPage";
 import HotelPage from "./pages/Results/PlacesToStay/HotelPage";
 import OtherStaysPage from "./pages/Results/PlacesToStay/OtherStaysPage";
+import IntroPage from "./pages/Intro/IntroPage";
 
 setupIonicReact();
 
-const App: React.FC = () => (
-  <IonApp>
-    <IonReactRouter>
-        <IonRouterOutlet>
-          <Route exact path="/home">
-            <Home />
-          </Route>
-          <Route exact path="/results">
-            <Results />
-          </Route>
-          <Route exact path="/results/hotel">
-            <HotelPage />
-          </Route>
-          <Route exact path="/results/other">
-            <OtherStaysPage />
-          </Route>
-          <Route exact path="/things-to-do">
-            <ThingsToDoPage />
-          </Route>
-          <Route exact path="/find-nearby-cities">
-            <NearbyCitiesPage />
-          </Route>
-          <Route exact path="/">
-            <Redirect to="/home" />
-          </Route>
-        </IonRouterOutlet>
-    </IonReactRouter>
-  </IonApp>
-);
+const App: React.FC = () => {
+    // only display intro screen on first visit
+    const introSeen = localStorage.getItem("introSeen");
+
+    return (
+        <IonApp>
+            <IonReactRouter>
+                <IonRouterOutlet>
+                    {introSeen ? (
+                        <>
+                            <Route exact path="/home">
+                                <Home />
+                            </Route>
+                            <Route exact path="/results">
+                                <Results />
+                            </Route>
+                            <Route exact path="/results/hotel">
+                                <HotelPage />
+                            </Route>
+                            <Route exact path="/results/other">
+                                <OtherStaysPage />
+                            </Route>
+                            <Route exact path="/things-to-do">
+                                <ThingsToDoPage />
+                            </Route>
+                            <Route exact path="/find-nearby-cities">
+                                <NearbyCitiesPage />
+                            </Route>
+                            <Route exact path="/">
+                                <Redirect to="/home" />
+                            </Route>
+                        </>
+                    ) : (
+                        <Route path="/">
+                            <IntroPage />
+                        </Route>
+                    )}
+                </IonRouterOutlet>
+            </IonReactRouter>
+        </IonApp>
+    );
+};
 
 export default App;
