@@ -138,45 +138,14 @@ async function findLocationsToMeet(
     return cities;
 }
 
-const mockPersonA = {
-    name: "Coleman Briguglio",
-    address: "410 E 4th Ave",
-    city: "Lititz",
-    state: "PA",
-    zipCode: "17543",
-    country: "US",
-    photo: null,
-    coordinates: {
-        latitude: 40.1495276,
-        longitude: -76.2973725,
-    },
-};
-
-const mockPersonB = {
-    name: "Fafa Havi",
-    address: "1200 Park Rd",
-    city: "Harrisonburg",
-    state: "VA",
-    zipCode: "22802",
-    country: "US",
-    photo: null,
-    coordinates: {
-        latitude: 38.4720566,
-        longitude: -78.8787092,
-    },
-};
-
 const Results: React.FC = () => {
     const location = useLocation();
-    // const [personA, setPersonA] = useState<FormDataType>(
-    //     (location.state as ResultsProps)?.personA
-    // );
-    // const [personB, setPersonB] = useState<FormDataType>(
-    //     (location.state as ResultsProps)?.personB
-    // );
-
-    const [personA, setPersonA] = useState<FormDataType>(mockPersonA);
-    const [personB, setPersonB] = useState<FormDataType>(mockPersonB);
+    const [personA, setPersonA] = useState<FormDataType>(
+        (location.state as ResultsProps)?.personA
+    );
+    const [personB, setPersonB] = useState<FormDataType>(
+        (location.state as ResultsProps)?.personB
+    );
 
     const [curCity, setCurCity] = useState<City>({} as City);
     const [middleCityList, setMiddleCityList] = useState<City[]>([]);
