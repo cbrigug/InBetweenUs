@@ -35,7 +35,7 @@ import Results from "./pages/Results/Results";
 import ThingsToDoPage from "./pages/Results/ThingsToDo/ThingsToDoPage";
 import NearbyCitiesPage from "./pages/Results/NearbyCities/NearbyCitiesPage";
 import HotelPage from "./pages/Results/PlacesToStay/HotelPage";
-import CheapestStaysPage from "./pages/Results/PlacesToStay/CheapestStays";
+import OtherStaysPage from "./pages/Results/PlacesToStay/OtherStaysPage";
 
 setupIonicReact();
 
@@ -52,8 +52,8 @@ const App: React.FC = () => (
           <Route exact path="/results/hotel">
             <HotelPage />
           </Route>
-          <Route exact path="/results/cheapest">
-            <CheapestStaysPage />
+          <Route exact path="/results/other">
+            <OtherStaysPage />
           </Route>
           <Route exact path="/things-to-do">
             <ThingsToDoPage />

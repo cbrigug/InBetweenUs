@@ -3,6 +3,7 @@ import {
     faBed,
     faDollarSign,
     faHotel,
+    faTent,
 } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { IonCard, IonRippleEffect, IonRow, IonText } from "@ionic/react";
@@ -13,7 +14,7 @@ import { useHistory } from "react-router";
 import { ShortCoords } from "../../../interfaces/City";
 
 interface PlaceToStayCardProps {
-    type: "hotel" | "airbnb" | "cheapest";
+    type: "hotel" | "airbnb" | "other";
     coords: ShortCoords;
 }
 
@@ -53,7 +54,7 @@ const PlaceToStayCard: React.FC<PlaceToStayCardProps> = ({ type, coords }) => {
     const typeToIcon = {
         hotel: faHotel,
         airbnb: faAirbnb,
-        cheapest: faDollarSign,
+        other: faTent,
     };
 
     const selectedIcon = typeToIcon[type];

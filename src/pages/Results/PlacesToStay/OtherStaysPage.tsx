@@ -23,7 +23,7 @@ import { CapacitorHttp } from "@capacitor/core";
 import { toTitleCase } from "../../../utils/stringUtils";
 import { createUseStyles } from "react-jss";
 
-interface HotelPageProps {
+interface OtherStaysPageProps {
     coords: ShortCoords;
 }
 
@@ -39,24 +39,24 @@ const useStyles = createUseStyles({
     },
 });
 
-const HotelPage: React.FC = () => {
+const OtherStaysPage: React.FC = () => {
     const classes = useStyles();
     const location = useLocation();
 
     const [coords, setCoords] = useState<ShortCoords>(
-        (location.state as HotelPageProps)?.coords ?? {}
+        (location.state as OtherStaysPageProps)?.coords ?? {}
     );
 
-    const [hotels, setHotels] = useState([]);
+    const [otherPlacesToStay, setOtherPlacesToStay] = useState([]);
 
     useEffect(() => {
-        const cachedHotels = localStorage.getItem("hotels");
+        const cachedOtherPlacesToStay = localStorage.getItem("otherPlacesToStay");
 
-        if (cachedHotels) {
-            setHotels(JSON.parse(cachedHotels));
+        if (cachedOtherPlacesToStay) {
+            setOtherPlacesToStay(JSON.parse(cachedOtherPlacesToStay));
         } else {
             const fetchPlaces = async () => {
-                const url = `https://api.opentripmap.com/0.1/en/places/radius?radius=${RADIUS}&lon=${coords.lng}&lat=${coords.lat}&kinds=other_hotels&limit=10&apikey=${OPENTRIPMAP_API_KEY}`;
+                const url = `https://api.opentripmap.com/0.1/en/places/radius?radius=${RADIUS}&lon=${coords.lng}&lat=${coords.lat}&kinds=accomodations&limit=10&apikey=${OPENTRIPMAP_API_KEY}`;
 
                 const response = await CapacitorHttp.get({ url });
 
@@ -65,13 +65,13 @@ const HotelPage: React.FC = () => {
                 );
 
                 // Cache the fetched data in localStorage
-                localStorage.setItem("hotels", JSON.stringify(places));
+                localStorage.setItem("otherPlacesToStay", JSON.stringify(places));
 
                 return places;
             };
 
             fetchPlaces().then((places) => {
-                setHotels(places);
+                setOtherPlacesToStay(places);
             });
         }
     }, [coords]);
@@ -96,13 +96,14 @@ const HotelPage: React.FC = () => {
                         </IonButton>
                     </IonButtons>
                     <IonTitle>
-                        <IonText>Hotels</IonText>
+                        <IonText>Other&nbsp;</IonText>
+                        <IonText color="primary">Stays</IonText>
                     </IonTitle>
                 </IonToolbar>
             </IonHeader>
             <IonContent className="ion-padding">
                 <IonList>
-                    {hotels.map((hotel: any) => (
+                    {otherPlacesToStay.map((hotel: any) => (
                         <IonItem
                             key={hotel.xid}
                             button
@@ -136,4 +137,4 @@ const HotelPage: React.FC = () => {
     );
 };
 
-export default HotelPage;
+export default OtherStaysPage;

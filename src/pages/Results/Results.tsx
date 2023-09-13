@@ -314,11 +314,11 @@ const Results: React.FC = () => {
 
     // clear storage caches on change of personA or personB or curCity
     useEffect(() => {
-        // clear hotel cache
         localStorage.removeItem("hotels");
         localStorage.removeItem("thingsToDoPreviewIds");
         localStorage.removeItem("thingsToDoPreviewDetails");
         localStorage.removeItem("thingsToDo");
+        localStorage.removeItem("otherPlacesToStay")
     }, [personA, personB, curCity]);
 
     return (

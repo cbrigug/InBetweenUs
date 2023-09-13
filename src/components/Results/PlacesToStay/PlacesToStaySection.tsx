@@ -36,7 +36,7 @@ const PlacesToStaySection: React.FC<PlacesToStaySectionProps> = ({
                         <PlaceToStayCard type="airbnb" coords={coords} />
                     </IonCol>
                     <IonCol size="4">
-                        <PlaceToStayCard type="cheapest" coords={coords} />
+                        <PlaceToStayCard type="other" coords={coords} />
                     </IonCol>
                 </IonRow>
             </IonGrid>
