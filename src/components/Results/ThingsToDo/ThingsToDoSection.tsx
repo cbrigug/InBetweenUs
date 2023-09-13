@@ -5,6 +5,7 @@ import {
     IonGrid,
     IonRow,
     IonCol,
+    IonSkeletonText,
 } from "@ionic/react";
 import { chevronForward } from "ionicons/icons";
 import React, { useEffect, useState } from "react";
@@ -124,26 +125,52 @@ const ThingsToDoSection: React.FC<ThingsToDoSectionProps> = ({
                 <IonIcon icon={chevronForward} slot="end" />
             </IonItem>
 
-            <IonGrid className="ion-no-padding">
-                <IonRow
-                    style={{
-                        marginBottom: "calc(var(--ion-margin, 16px) * 0.25)",
-                    }}
-                >
-                    <Swiper slidesPerView={2}>
-                        {thingsToDo.map((thingToDo) => (
-                            <SwiperSlide key={thingToDo.xid}>
-                                <ThingToDoCard thingToDo={thingToDo} />
+            {thingsToDo.length > 0 ? (
+                <IonGrid className="ion-no-padding">
+                    <IonRow
+                        style={{
+                            marginBottom:
+                                "calc(var(--ion-margin, 16px) * 0.25)",
+                        }}
+                    >
+                        <Swiper slidesPerView={2}>
+                            {thingsToDo.map((thingToDo) => (
+                                <SwiperSlide key={thingToDo.xid}>
+                                    <ThingToDoCard thingToDo={thingToDo} />
+                                </SwiperSlide>
+                            ))}
+                            <SwiperSlide>
+                                <MoreThingsToDoCard
+                                    navToThingsToDo={navToThingsToDo}
+                                />
                             </SwiperSlide>
-                        ))}
-                        <SwiperSlide>
-                            <MoreThingsToDoCard
-                                navToThingsToDo={navToThingsToDo}
+                        </Swiper>
+                    </IonRow>
+                </IonGrid>
+            ) : (
+                // Skeleton loading
+                <IonGrid className="ion-no-padding">
+                    <IonRow
+                        style={{
+                            marginBottom:
+                                "calc(var(--ion-margin, 16px) * 0.25)",
+                        }}
+                    >
+                        <IonCol size="6">
+                            <IonSkeletonText
+                                animated
+                                style={{ width: "95%", height: "96px" }}
                             />
-                        </SwiperSlide>
-                    </Swiper>
-                </IonRow>
-            </IonGrid>
+                        </IonCol>
+                        <IonCol size="6">
+                            <IonSkeletonText
+                                animated
+                                style={{ width: "100%", height: "96px" }}
+                            />
+                        </IonCol>
+                    </IonRow>
+                </IonGrid>
+            )}
         </>
     );
 };
