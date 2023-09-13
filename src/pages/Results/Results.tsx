@@ -312,6 +312,12 @@ const Results: React.FC = () => {
         fetchCoords();
     }, [personA, personB, flexibility]);
 
+    // clear storage caches on change of personA or personB or curCity
+    useEffect(() => {
+        // clear hotel cache
+        localStorage.removeItem("hotels");
+    }, [personA, personB, curCity]);
+
     return (
         <IonPage>
             <IonHeader className="ion-no-border">
