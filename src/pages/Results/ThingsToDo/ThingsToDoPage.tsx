@@ -89,24 +89,42 @@ const ThingsToDoPage: React.FC = () => {
     useEffect(() => {
         setActiveFilters([]);
 
-        const fetchPlaces = async () => {
-            const url = `https://api.opentripmap.com/0.1/en/places/radius?radius=${RADIUS}&lon=${coords.lng}&lat=${coords.lat}&rate=3&limit=30&apikey=${OPENTRIPMAP_API_KEY}`;
+        const cachedThingsToDo = localStorage.getItem("thingsToDo");
 
-            const response = await CapacitorHttp.get({ url });
+        if (cachedThingsToDo) {
+            const cachedPlaces = JSON.parse(cachedThingsToDo);
 
-            return response.data.features.map(
-                (feature: any) => feature.properties
-            );
-        };
+            setAllThingsToDo(cachedPlaces);
+            setFilteredThingsToDo(cachedPlaces);
+            setThingsToDo(cachedPlaces.slice(0, ITEMS_PER_PAGE));
+            console.log(cachedPlaces.slice(0, ITEMS_PER_PAGE));
+        } else {
+            const fetchPlaces = async () => {
+                const url = `https://api.opentripmap.com/0.1/en/places/radius?radius=${RADIUS}&lon=${coords.lng}&lat=${coords.lat}&rate=3&limit=100&apikey=${OPENTRIPMAP_API_KEY}`;
 
-        fetchPlaces().then((places) => {
-            setAllThingsToDo(places);
-            setFilteredThingsToDo(places);
-            setThingsToDo(places.slice(0, ITEMS_PER_PAGE));
-        });
+                const response = await CapacitorHttp.get({ url });
+
+                const places = response.data.features.map(
+                    (feature: any) => feature.properties
+                );
+
+                // Cache the fetched data in localStorage
+                localStorage.setItem("thingsToDo", JSON.stringify(places));
+
+                return places;
+            };
+
+            fetchPlaces().then((places) => {
+                setAllThingsToDo(places);
+                setFilteredThingsToDo(places);
+                setThingsToDo(places.slice(0, ITEMS_PER_PAGE));
+            });
+        }
     }, [coords]);
 
     const handleInfiniteScroll = () => {
+        console.log("scroll");
+
         // new items to display
         const newThingsToDo = filteredThingsToDo.slice(
             0,
@@ -148,7 +166,7 @@ const ThingsToDoPage: React.FC = () => {
         }
 
         setFilteredThingsToDo(filteredThingsToDo);
-        setThingsToDo(filteredThingsToDo);
+        setThingsToDo(filteredThingsToDo.slice(0, ITEMS_PER_PAGE));
     }, [search, activeFilters]);
 
     const removeChip = (activityType: string) => {
