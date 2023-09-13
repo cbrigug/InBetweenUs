@@ -316,6 +316,8 @@ const Results: React.FC = () => {
     useEffect(() => {
         // clear hotel cache
         localStorage.removeItem("hotels");
+        localStorage.removeItem("thingsToDoPreviewIds");
+        localStorage.removeItem("thingsToDoPreviewDetails");
         localStorage.removeItem("thingsToDo");
     }, [personA, personB, curCity]);
 
