@@ -34,6 +34,8 @@ import "./theme/variables.css";
 import Results from "./pages/Results/Results";
 import ThingsToDoPage from "./pages/Results/ThingsToDo/ThingsToDoPage";
 import NearbyCitiesPage from "./pages/Results/NearbyCities/NearbyCitiesPage";
+import HotelPage from "./pages/Results/PlacesToStay/HotelPage";
+import CheapestStaysPage from "./pages/Results/PlacesToStay/CheapestStays";
 
 setupIonicReact();
 
@@ -46,6 +48,12 @@ const App: React.FC = () => (
           </Route>
           <Route exact path="/results">
             <Results />
+          </Route>
+          <Route exact path="/results/hotel">
+            <HotelPage />
+          </Route>
+          <Route exact path="/results/cheapest">
+            <CheapestStaysPage />
           </Route>
           <Route exact path="/things-to-do">
             <ThingsToDoPage />

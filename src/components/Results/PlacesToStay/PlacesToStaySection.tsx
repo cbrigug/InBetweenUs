@@ -7,14 +7,7 @@ import {
     IonRow,
     IonCol,
 } from "@ionic/react";
-import { chevronForward } from "ionicons/icons";
-import Swiper from "swiper";
-import { SwiperSlide } from "swiper/react";
-import MoreThingsToDoCard from "../ThingsToDo/MoreThingsToDoCard";
-import ThingToDoCard from "../ThingsToDo/ThingToDoCard";
-import HotelCard from "./HotelCard";
-import AirbnbCard from "./AirbnbCard";
-import CheapestStayCard from "./CheapestStayCard";
+import PlaceToStayCard from "./PlaceToStayCard";
 
 interface PlacesToStaySectionProps {
     coords: ShortCoords;
@@ -37,13 +30,13 @@ const PlacesToStaySection: React.FC<PlacesToStaySectionProps> = ({
                     }}
                 >
                     <IonCol size="4">
-                        <HotelCard />
+                        <PlaceToStayCard type="hotel" coords={coords} />
                     </IonCol>
                     <IonCol size="4">
-                        <AirbnbCard />
+                        <PlaceToStayCard type="airbnb" coords={coords} />
                     </IonCol>
                     <IonCol size="4">
-                        <CheapestStayCard />
+                        <PlaceToStayCard type="cheapest" coords={coords} />
                     </IonCol>
                 </IonRow>
             </IonGrid>

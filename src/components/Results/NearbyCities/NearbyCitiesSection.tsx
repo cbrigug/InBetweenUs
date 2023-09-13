@@ -57,15 +57,8 @@ const NearbyCitiesSection: React.FC<NearbyCitiesSectionProps> = ({
     setCurrentCity,
 }) => {
     const classes = useStyles();
-    const history = useHistory();
 
     const [isOpen, setIsOpen] = useState(false);
-
-    const navToFindNearestCities = () => {
-        history.push("/find-nearby-cities", {
-            cities,
-        });
-    };
 
     return (
         <>

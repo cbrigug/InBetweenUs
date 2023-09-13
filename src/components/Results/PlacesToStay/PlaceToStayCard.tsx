@@ -9,9 +9,12 @@ import { IonCard, IonRippleEffect, IonRow, IonText } from "@ionic/react";
 import React from "react";
 import { createUseStyles } from "react-jss";
 import { capitalize } from "../../../utils/stringUtils";
+import { useHistory } from "react-router";
+import { ShortCoords } from "../../../interfaces/City";
 
 interface PlaceToStayCardProps {
     type: "hotel" | "airbnb" | "cheapest";
+    coords: ShortCoords;
 }
 
 const useStyles = createUseStyles({
@@ -36,8 +39,16 @@ const useStyles = createUseStyles({
     },
 });
 
-const PlaceToStayCard: React.FC<PlaceToStayCardProps> = ({ type }) => {
+const PlaceToStayCard: React.FC<PlaceToStayCardProps> = ({ type, coords }) => {
     const classes = useStyles();
+
+    const history = useHistory();
+
+    const navPlacesToStayPages = () => {
+        history.push(`/results/${type}`, {
+            coords,
+        });
+    };
 
     const typeToIcon = {
         hotel: faHotel,
@@ -53,6 +64,7 @@ const PlaceToStayCard: React.FC<PlaceToStayCardProps> = ({ type }) => {
                 className={`ion-no-margin ${classes.card}`}
                 color="tertiary"
                 button
+                onClick={navPlacesToStayPages}
                 disabled={type === "airbnb"}
             >
                 <IonRippleEffect />
