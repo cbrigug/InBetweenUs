@@ -308,6 +308,11 @@ const PersonModal: React.FC<PersonModalProps> = ({
         setState(type.state);
         setZipCode(type.zipCode);
         setCountry(type.country);
+
+        setCoords({
+            latitude: type.coordinates.latitude,
+            longitude: type.coordinates.longitude,
+        });
     };
 
     // The formData const here is for when we open up the user profile modal,

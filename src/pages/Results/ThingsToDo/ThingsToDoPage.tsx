@@ -97,7 +97,6 @@ const ThingsToDoPage: React.FC = () => {
             setAllThingsToDo(cachedPlaces);
             setFilteredThingsToDo(cachedPlaces);
             setThingsToDo(cachedPlaces.slice(0, ITEMS_PER_PAGE));
-            console.log(cachedPlaces.slice(0, ITEMS_PER_PAGE));
         } else {
             const fetchPlaces = async () => {
                 const url = `https://api.opentripmap.com/0.1/en/places/radius?radius=${RADIUS}&lon=${coords.lng}&lat=${coords.lat}&rate=3&limit=100&apikey=${OPENTRIPMAP_API_KEY}`;
@@ -123,8 +122,6 @@ const ThingsToDoPage: React.FC = () => {
     }, [coords]);
 
     const handleInfiniteScroll = () => {
-        console.log("scroll");
-
         // new items to display
         const newThingsToDo = filteredThingsToDo.slice(
             0,
