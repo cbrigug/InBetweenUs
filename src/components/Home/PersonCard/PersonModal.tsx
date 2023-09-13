@@ -69,6 +69,7 @@ const PersonModal: React.FC<PersonModalProps> = ({
     formData,
 }) => {
     const [contact, setContact] = useState<ContactPayload | null>(null);
+    const [profile, setProfile] = useState<FormDataType | null>(null);
     const [present] = useIonToast();
 
     // Form fields
@@ -299,19 +300,27 @@ const PersonModal: React.FC<PersonModalProps> = ({
         }
     }, [contact]);
 
-    // this is mainly for the profile modal
-    // load form data instantly if it exists
+    const resetForm = (type: FormDataType) => {
+        setPhoto(type.photo ?? null);
+        setName(type.name);
+        setAddress(type.address);
+        setCity(type.city);
+        setState(type.state);
+        setZipCode(type.zipCode);
+        setCountry(type.country);
+    };
+
+    // The formData const here is for when we open up the user profile modal,
+    // we want the form to be pre-filled with the profile data if it exists.
+    // The profile const is for when we are importing a contact using
+    // the data from the profile.
     useEffect(() => {
         if (formData) {
-            setPhoto(formData.photo ?? null);
-            setName(formData.name);
-            setAddress(formData.address);
-            setCity(formData.city);
-            setState(formData.state);
-            setZipCode(formData.zipCode);
-            setCountry(formData.country);
+            resetForm(formData);
+        } else if (profile) {
+            resetForm(profile);
         }
-    }, [formData]);
+    }, [formData, profile]);
 
     return (
         <IonModal isOpen={isModalOpen} onDidDismiss={toggleModal} ref={modal}>
@@ -450,7 +459,12 @@ const PersonModal: React.FC<PersonModalProps> = ({
                     />
                 </IonItem>
             </IonContent>
-            <ImportContact setContact={setContact} />
+            {type !== "profile" && (
+                <ImportContact
+                    setContact={setContact}
+                    setProfile={setProfile}
+                />
+            )}
         </IonModal>
     );
 };
