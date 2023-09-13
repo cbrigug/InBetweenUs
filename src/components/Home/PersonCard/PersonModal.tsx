@@ -13,11 +13,12 @@ import {
     IonLabel,
     IonModal,
     IonRow,
+    IonText,
     IonTitle,
     IonToolbar,
     useIonToast,
 } from "@ionic/react";
-import { locateOutline } from "ionicons/icons";
+import { checkmark, checkmarkCircle, locateOutline } from "ionicons/icons";
 import React, { useState, useEffect } from "react";
 import ImportContact from "../ImportContact";
 import { ContactPayload } from "@capacitor-community/contacts";
@@ -79,7 +80,10 @@ const PersonModal: React.FC<PersonModalProps> = ({
     const [country, setCountry] = useState(formData?.country ?? "");
     const [isFormValid, setIsFormValid] = useState(false);
 
-    const [coords, setCoords] = useState<Coordinates>({ latitude: 0, longitude: 0});
+    const [coords, setCoords] = useState<Coordinates>({
+        latitude: 0,
+        longitude: 0,
+    });
 
     useEffect(() => {
         setIsFormValid(
@@ -299,18 +303,24 @@ const PersonModal: React.FC<PersonModalProps> = ({
             <IonHeader>
                 <IonToolbar>
                     <IonButtons slot="start">
-                        <IonButton onClick={handleCancel}>Cancel</IonButton>
+                        <IonButton onClick={handleCancel}>
+                            <IonText color="dark" style={{fontSize: "1.2rem"}}>Cancel</IonText>
+                        </IonButton>
                     </IonButtons>
                     <IonTitle className="ion-text-center">
-                        {isDetails ? "Edit Person" : "Add Person"}
+                        <IonText color={"primary"}>
+                            {isDetails ? "Edit" : "Add"}
+                        </IonText>
+                        <IonText>&nbsp;Person</IonText>
                     </IonTitle>
                     <IonButtons slot="end">
                         <IonButton
-                            strong={true}
                             onClick={handleConfirm}
                             disabled={!isFormValid}
                         >
-                            Confirm
+                            <IonText style={{fontSize: "1.2rem"}}>
+                                Confirm
+                            </IonText>
                         </IonButton>
                     </IonButtons>
                 </IonToolbar>
