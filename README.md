@@ -22,7 +22,6 @@ Join us in redefining the way we connect, one intermediate point at a time.
 <kbd>
 <img src="https://github.com/cbrigug/InBetweenUs/assets/50587044/d5b62c78-99c1-40b7-9598-2e210ed9008c" width="190px" height="333px">
 </kbd>
-<kbd>
 <br>
 <kbd>
 <img src="https://github.com/cbrigug/InBetweenUs/assets/50587044/5386b57f-3c3a-48e5-833d-fc62c01ba778" width="190px" height="333px">
